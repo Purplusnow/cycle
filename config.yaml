@@ -34,15 +34,16 @@ analytics:
 # 남아 화면만 성기게 되는 것을 막기 위해서다. 로더는 실리므로 콘솔에서
 # **자동 광고**를 켜 두었다면 그것만으로 게재된다.
 #
-# 게재 시작 전에 콘솔에서 할 일:
-#   1) 사이트에 cycle.koreanblog.xyz 추가 → 승인 대기
-#   2) (선택) 광고 단위 3개 생성 후 아래 slot_* 에 번호를 채운다
-#      cycle.koreanblog.xyz_top / _article / _bottom
+# 광고 자리는 **본문을 읽은 뒤**에 둔다 — 첫 화면은 편성 아래, 상세는 예상판을
+# 읽은 다음. 라벨을 달아 예상 내용과 섞여 보이지 않게 한다.
+#
+# 게재는 콘솔에서 cycle.koreanblog.xyz 가 승인된 뒤에 시작된다. 승인 전에는
+# 로더와 빈 자리만 실린다.
 adsense:
   client: "ca-pub-4640178123605595"
-  slot_top: ""          # 첫 화면 편성 아래
-  slot_in_article: ""   # 상세 예상판 다음
-  slot_bottom: ""       # 페이지 끝
+  slot_top: "1671424837"          # cycle.koreanblog.xyz_top — 첫 화면 편성 아래
+  slot_in_article: "8847403390"   # cycle.koreanblog.xyz_article — 상세 예상판 다음
+  slot_bottom: "8045261492"       # cycle.koreanblog.xyz_bottom — 페이지 끝
 
 build:
   # 상세 페이지를 만들 과거 경주 수. 워크포워드 기록이 1만 3천 경주라 전부
