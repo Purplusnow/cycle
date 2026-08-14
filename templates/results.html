@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "_macros.html" import race_card, ad with context %}
+
+{% block title %}결과 아카이브 · {{ site.name }}{% endblock %}
+{% block description %}예상과 실제 결과를 경주 단위로 대조한 기록. 빗나간 예상도 그대로 남깁니다.{% endblock %}
+
+{% block content %}
+
+<h1>결과</h1>
+<p class="lede">
+  예상과 실제 착순을 경주 단위로 대조한 기록입니다. 적중·불발을 선별 없이
+  모두 게시합니다.
+</p>
+
+<section class="card">
+  <h2>최근 {{ races | length }}경주</h2>
+  <div class="ri-list">
+    {% set vr = races | map(attribute='version') | unique | list %}
+    {% for r in races %}{{ race_card(r, version_label, true, false, vr | length > 1, true) }}{% endfor %}
+  </div>
+</section>
+
+{{ ad(adsense, 'slot_bottom') }}
+
+{% endblock %}

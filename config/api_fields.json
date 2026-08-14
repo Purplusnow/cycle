@@ -1,0 +1,605 @@
+{
+  "race_card": {
+    "fields": [
+      "area_tms3_avg_scr",
+      "back_no",
+      "bf1_day1_rank",
+      "bf1_day1_ymd",
+      "bf1_day2_rank",
+      "bf1_day3_rank",
+      "bf1_meet_nm_nm",
+      "bf2_day1_rank",
+      "bf2_day1_ymd",
+      "bf2_day2_rank",
+      "bf2_day3_rank",
+      "bf2_meet_nm",
+      "bf3_day1_rank",
+      "bf3_day1_ymd",
+      "bf3_day2_rank",
+      "bf3_day3_rank",
+      "bf3_meet_nm",
+      "brk_win_cnt",
+      "color_nm",
+      "day_tcnt",
+      "dptre_tm",
+      "gear_rate",
+      "high_3_rate",
+      "high_rate",
+      "meet_nm",
+      "mrk_win_cnt",
+      "pas_win_cnt",
+      "period_no",
+      "pre_win_cnt",
+      "race_len",
+      "race_no",
+      "race_ymd",
+      "racer_age",
+      "racer_grd_bef_cd",
+      "racer_grd_cd",
+      "racer_grd_cur_cd",
+      "racer_nm",
+      "rec_200m_scr",
+      "round_cnt",
+      "row_num",
+      "run_day_tcnt",
+      "stnd_yr",
+      "tot_tms_avg_scr",
+      "trng_plc_nm",
+      "week_tcnt",
+      "win_rate",
+      "win_tot_tcnt"
+    ],
+    "sample": {
+      "bf3_meet_nm": "광",
+      "race_no": "01",
+      "gear_rate": "3.92",
+      "bf2_meet_nm": "창",
+      "bf3_day1_ymd": "1024",
+      "mrk_win_cnt": "2",
+      "bf3_day2_rank": "선발 3-7",
+      "race_len": "1691",
+      "dptre_tm": "12\"55",
+      "win_tot_tcnt": "2",
+      "row_num": 1,
+      "racer_nm": "신용수",
+      "area_tms3_avg_scr": "81.943",
+      "race_ymd": "2026.01.02",
+      "bf1_day3_rank": "선발 3-3",
+      "bf2_day1_rank": "선발 2-4",
+      "round_cnt": "5",
+      "meet_nm": "광명  ",
+      "bf3_day3_rank": "선발 4-5",
+      "back_no": "1",
+      "pre_win_cnt": "0",
+      "bf1_day1_ymd": "1205",
+      "bf2_day2_rank": "선발 4-7",
+      "stnd_yr": "2026",
+      "trng_plc_nm": "서울A",
+      "high_3_rate": "5",
+      "win_rate": "0",
+      "racer_grd_cd": "선발",
+      "run_day_tcnt": "23",
+      "color_nm": "백",
+      "bf1_meet_nm_nm": "부",
+      "bf1_day1_rank": "선발 4-5",
+      "racer_age": "53",
+      "week_tcnt": "01",
+      "day_tcnt": "1",
+      "bf3_day1_rank": "선발 3-7",
+      "tot_tms_avg_scr": "81.744",
+      "racer_grd_cur_cd": "B3",
+      "high_rate": "0",
+      "racer_grd_bef_cd": "B3",
+      "rec_200m_scr": "12\"00",
+      "bf2_day3_rank": "선발 1-7",
+      "pas_win_cnt": "0",
+      "period_no": "1",
+      "brk_win_cnt": "0",
+      "bf1_day2_rank": "선발 3-7",
+      "bf2_day1_ymd": "1107"
+    },
+    "params": {
+      "stnd_yr": "2026"
+    },
+    "total": 11200
+  },
+  "race_rank": {
+    "fields": [
+      "day_ord",
+      "meet_nm",
+      "race_day",
+      "race_no",
+      "race_rank",
+      "racer_nm",
+      "racer_no",
+      "row_num",
+      "stnd_year",
+      "tms"
+    ],
+    "sample": {
+      "race_day": "20260613",
+      "meet_nm": "광명",
+      "race_no": "15",
+      "day_ord": "2",
+      "race_rank": "06",
+      "racer_no": "20100013",
+      "row_num": 1,
+      "tms": "24",
+      "racer_nm": "유태복",
+      "stnd_year": "2026"
+    },
+    "params": {
+      "stnd_yr": "2026"
+    },
+    "total": 14455
+  },
+  "payoff": {
+    "fields": [
+      "day_tcnt",
+      "pool1_val",
+      "pool2_1_val",
+      "pool2_2_val",
+      "pool4_val",
+      "pool5_val",
+      "pool6_val",
+      "race_no",
+      "race_ymd",
+      "row_num",
+      "stnd_yr",
+      "week_tcnt"
+    ],
+    "sample": {
+      "race_no": "01",
+      "pool4_val": "9.4",
+      "pool5_val": "5.6",
+      "week_tcnt": 1,
+      "pool6_val": "3.4",
+      "day_tcnt": 1,
+      "pool1_val": "2.5",
+      "pool2_2_val": "2.1",
+      "stnd_yr": "2026",
+      "row_num": 1,
+      "race_ymd": "20260102",
+      "pool2_1_val": "1.2"
+    },
+    "params": {
+      "stnd_yr": "2026",
+      "week_tcnt": 1,
+      "day_tcnt": 1
+    },
+    "total": 16
+  },
+  "race_result": {
+    "fields": [
+      "day_tcnt",
+      "meet_nm",
+      "pool1_val",
+      "pool2_val",
+      "pool4_val",
+      "pool5_val",
+      "pool6_val",
+      "pool7_val",
+      "pool8_val",
+      "race_no",
+      "race_ymd",
+      "rank1",
+      "rank2",
+      "rank3",
+      "row_num",
+      "stnd_yr",
+      "week_tcnt"
+    ],
+    "sample": {
+      "race_no": "01",
+      "pool4_val": "(2-7)9.4",
+      "week_tcnt": 1,
+      "pool6_val": "(2-7-5)3.4",
+      "day_tcnt": 1,
+      "pool1_val": "(2)2.5",
+      "pool2_val": "(2)1.2 (7)2.1",
+      "pool8_val": "(2-7-5)6.4",
+      "row_num": 1,
+      "race_ymd": "0102",
+      "meet_nm": "광명",
+      "rank1": "②이길섭",
+      "rank2": "⑦김용남",
+      "pool5_val": "(2-7)5.6",
+      "rank3": "⑤최원재",
+      "stnd_yr": "2026",
+      "pool7_val": "(2-7-5)20.5"
+    },
+    "params": {
+      "stnd_yr": "2026",
+      "meet_nm": "광명",
+      "week_tcnt": 1,
+      "day_tcnt": 1,
+      "race_no": 1
+    },
+    "total": 1
+  },
+  "tms_score": {
+    "fields": [
+      "day_tcnt",
+      "meet_nm",
+      "race_scr",
+      "racer_nm",
+      "row_num",
+      "stnd_yr",
+      "week_tcnt"
+    ],
+    "sample": {
+      "meet_nm": "광명",
+      "week_tcnt": 1,
+      "day_tcnt": 1,
+      "race_scr": 91,
+      "stnd_yr": "2026",
+      "row_num": 1,
+      "racer_nm": "김주호"
+    },
+    "params": {
+      "stnd_yr": "2026",
+      "week_tcnt": 1
+    },
+    "total": 333
+  },
+  "down_accident": {
+    "fields": [
+      "day_ord",
+      "down_acdnt_cd",
+      "down_indu1_yn",
+      "down_indu7_yn",
+      "race_no",
+      "racer_no1",
+      "racer_no2",
+      "racer_no3",
+      "racer_no4",
+      "racer_no5",
+      "racer_no6",
+      "racer_no7",
+      "row_num",
+      "stnd_year",
+      "tms"
+    ],
+    "sample": {
+      "down_indu7_yn": "공정위반",
+      "race_no": "14",
+      "row_num": 1,
+      "stnd_year": "2026",
+      "down_acdnt_cd": "낙차",
+      "racer_no2": "신은섭",
+      "racer_no1": "이성재",
+      "racer_no4": "유지훈",
+      "day_ord": "3",
+      "racer_no3": "양희천",
+      "racer_no6": "임유섭",
+      "racer_no5": "김동훈",
+      "down_indu1_yn": "공정위반",
+      "racer_no7": "이재림",
+      "tms": "04"
+    },
+    "params": {
+      "stnd_yr": "2026"
+    },
+    "total": 68
+  },
+  "sanction": {
+    "fields": [
+      "p_johang",
+      "p_kind",
+      "p_period",
+      "racer_id",
+      "racer_nm",
+      "row_num"
+    ],
+    "sample": {
+      "p_kind": "출전정지",
+      "row_num": 1,
+      "racer_nm": "현지운",
+      "p_johang": "ㅁ해당경주:26년광명제25회2일차15경주<BR>ㅁ시행규정:경륜시행규정 제42조 제3호<BR>ㅁ제재사유:ㅇ 경륜시행규정 제42조(출전정지)제3호\r\n - 경륜시행규정 제103조(실격 등)에 저촉된 경우",
+      "p_period": "1회 ",
+      "racer_id": "23-018"
+    },
+    "params": {},
+    "total": 589
+  },
+  "oppo_win": {
+    "fields": [
+      "draw_tcnt",
+      "lose_tcnt",
+      "meet_nm",
+      "oppo_racer_nm",
+      "racer_nm",
+      "row_num",
+      "same_win_tcnt",
+      "stnd_yr",
+      "win_tcnt"
+    ],
+    "sample": {
+      "meet_nm": "광명  ",
+      "oppo_racer_nm": "강양한",
+      "lose_tcnt": 0,
+      "win_tcnt": 1,
+      "stnd_yr": "2026",
+      "row_num": 1,
+      "same_win_tcnt": 0,
+      "racer_nm": "강동국",
+      "draw_tcnt": 0
+    },
+    "params": {
+      "stnd_yr": "2026"
+    },
+    "total": 44520
+  },
+  "racer_info": {
+    "fields": [
+      "down_po_cnt",
+      "elim_tcnt",
+      "go_po_tcnt",
+      "high_3_rate",
+      "high_rate",
+      "period_no",
+      "racer_grd_cd",
+      "racer_nm",
+      "rank1_tcnt",
+      "rank2_tcnt",
+      "rank3_tcnt",
+      "rank4_tcnt",
+      "rank5_tcnt",
+      "rank6_tcnt",
+      "rank7_tcnt",
+      "rank8_tcnt",
+      "rank9_tcnt",
+      "row_num",
+      "run_cnt",
+      "run_day_tcnt",
+      "stnd_yr",
+      "win_rate"
+    ],
+    "sample": {
+      "rank7_tcnt": "10",
+      "go_po_tcnt": "0",
+      "rank1_tcnt": "0",
+      "rank4_tcnt": "3",
+      "row_num": 1,
+      "rank5_tcnt": "3",
+      "racer_nm": "허은회",
+      "high_rate": "3",
+      "rank2_tcnt": "1",
+      "down_po_cnt": "0",
+      "rank9_tcnt": "0",
+      "rank8_tcnt": "0",
+      "elim_tcnt": "0",
+      "period_no": "1",
+      "stnd_yr": "2026",
+      "rank3_tcnt": "4",
+      "high_3_rate": "14",
+      "win_rate": "0",
+      "racer_grd_cd": "B3",
+      "run_cnt": "12",
+      "run_day_tcnt": "36",
+      "rank6_tcnt": "15"
+    },
+    "params": {
+      "stnd_yr": "2026"
+    },
+    "total": 577
+  },
+  "bkno_sum": {
+    "fields": [
+      "back_no_1_tcnt",
+      "back_no_2_tcnt",
+      "back_no_3_tcnt",
+      "back_no_4_tcnt",
+      "back_no_5_tcnt",
+      "back_no_6_tcnt",
+      "back_no_7_tcnt",
+      "racer_nm",
+      "row_num",
+      "stnd_yr"
+    ],
+    "sample": {
+      "back_no_5_tcnt": 2,
+      "back_no_1_tcnt": 3,
+      "back_no_4_tcnt": 3,
+      "stnd_yr": "2026",
+      "row_num": 1,
+      "racer_nm": "윤창호",
+      "back_no_6_tcnt": 4,
+      "back_no_2_tcnt": 3,
+      "back_no_3_tcnt": 2,
+      "back_no_7_tcnt": 4
+    },
+    "params": {
+      "stnd_yr": "2026"
+    },
+    "total": 555
+  },
+  "race_video": {
+    "fields": [
+      "day_tcnt",
+      "mbr_no",
+      "race_no",
+      "race_video_url",
+      "race_ymd",
+      "row_num",
+      "stnd_yr",
+      "week_tcnt"
+    ],
+    "sample": {
+      "race_no": "07",
+      "week_tcnt": 33,
+      "day_tcnt": 2,
+      "mbr_no": "001",
+      "stnd_yr": "2019",
+      "row_num": 1,
+      "race_ymd": "20190817",
+      "race_video_url": "http://cast.cyclerace.or.kr/pds/2019/8/17/330207.mp4"
+    },
+    "params": {},
+    "total": 16292
+  },
+  "start_photo": {
+    "fields": [
+      "day_tcnt",
+      "mbr_no",
+      "race_no",
+      "race_sn",
+      "row_num",
+      "start_photo_url",
+      "stnd_yr",
+      "week_tcnt"
+    ],
+    "sample": {
+      "race_no": "10",
+      "week_tcnt": 21,
+      "day_tcnt": 3,
+      "race_sn": 12169,
+      "start_photo_url": "http://www.kcycle.or.kr/contents/popup/judgePhotoPopup.do?img=1558857955149.jpg",
+      "mbr_no": "001",
+      "stnd_yr": "2019",
+      "row_num": 1
+    },
+    "params": {},
+    "total": 2918
+  },
+  "news": {
+    "fields": [
+      "row_num",
+      "title_nm",
+      "video_url"
+    ],
+    "sample": {
+      "title_nm": "2013 스피돔뉴스 15편",
+      "video_url": "http://cast.cyclerace.or.kr/pds/broadcast/2013/스피돔뉴스 15편.wmv",
+      "row_num": 1
+    },
+    "params": {},
+    "total": 248
+  },
+  "exercise": {
+    "fields": [
+      "day_tcnt",
+      "eclnt_nope",
+      "get_eclet_nope",
+      "race_ymd",
+      "repr_nope",
+      "rora_nope",
+      "row_num",
+      "starting_nope",
+      "stnd_yr",
+      "tak_nope",
+      "week_tcnt"
+    ],
+    "sample": {
+      "repr_nope": 0,
+      "get_eclet_nope": 0,
+      "week_tcnt": 1,
+      "day_tcnt": 1,
+      "starting_nope": 6,
+      "stnd_yr": "2026",
+      "row_num": 1,
+      "eclnt_nope": 1,
+      "race_ymd": "20260102",
+      "tak_nope": 7,
+      "rora_nope": 0
+    },
+    "params": {
+      "stnd_yr": "2026",
+      "week_tcnt": 1,
+      "day_tcnt": 1,
+      "race_ymd": "2026.01.02"
+    },
+    "total": 1
+  },
+  "inspect": {
+    "fields": [
+      "af_str1_tcnt",
+      "af_str2_tcnt",
+      "af_str3_tcnt",
+      "af_str4_tcnt",
+      "af_str5_tcnt",
+      "bf_strt1_tcnt",
+      "bf_strt2_tcnt",
+      "bf_strt3_tcnt",
+      "bf_strt4_tcnt",
+      "bf_strt5_tcnt",
+      "cfm_insp_cnt",
+      "dmag_cd",
+      "max_race_ymd",
+      "now_str1_tcnt",
+      "now_str2_tcnt",
+      "now_str3_tcnt",
+      "now_str4_tcnt",
+      "now_str5_tcnt",
+      "row_num",
+      "stnd_yr",
+      "week_tcnt"
+    ],
+    "sample": {
+      "bf_strt3_tcnt": 0,
+      "now_str3_tcnt": 0,
+      "week_tcnt": 1,
+      "af_str2_tcnt": 0,
+      "dmag_cd": "001",
+      "af_str5_tcnt": 0,
+      "bf_strt2_tcnt": 0,
+      "bf_strt4_tcnt": 0,
+      "row_num": 1,
+      "af_str3_tcnt": 0,
+      "af_str1_tcnt": 0,
+      "bf_strt5_tcnt": 0,
+      "now_str1_tcnt": 0,
+      "now_str4_tcnt": 0,
+      "now_str5_tcnt": 0,
+      "max_race_ymd": "20260104",
+      "bf_strt1_tcnt": 0,
+      "cfm_insp_cnt": 0,
+      "now_str2_tcnt": 0,
+      "stnd_yr": "2026",
+      "af_str4_tcnt": 0
+    },
+    "params": {
+      "stnd_yr": "2026",
+      "week_tcnt": 1
+    },
+    "total": 2
+  },
+  "inout": {
+    "fields": [
+      "cycle_keep_cnt",
+      "cycle_out_cnt",
+      "day_tcnt",
+      "row_num",
+      "stnd_yr",
+      "week_tcnt"
+    ],
+    "sample": {
+      "stnd_yr": "2026",
+      "week_tcnt": 1,
+      "row_num": 1,
+      "cycle_keep_cnt": 118,
+      "day_tcnt": 1,
+      "cycle_out_cnt": 0
+    },
+    "params": {
+      "stnd_yr": "2026",
+      "week_tcnt": 1,
+      "day_tcnt": 1
+    },
+    "total": 1
+  },
+  "cycle_part": {
+    "fields": [
+      "mstr_unit_nm",
+      "row_num",
+      "salv_unit_nm"
+    ],
+    "sample": {
+      "salv_unit_nm": "신코 프로 (전)",
+      "mstr_unit_nm": "타이어",
+      "row_num": 1
+    },
+    "params": {},
+    "total": 364
+  }
+}

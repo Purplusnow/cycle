@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "_macros.html" import race_card with context %}
+
+{% block title %}{{ date_label }} 광명 경륜 예상 · 전 경주{% endblock %}
+{% block description %}광명 {{ date_label }} 전 경주 예상과 결과.{% endblock %}
+
+{% block content %}
+
+<nav class="crumb"><a href="{{ base }}/">예상</a> › <span>{{ date_label }}</span></nav>
+
+<h1>{{ date_label }}</h1>
+<p class="lede">{{ races | length }}경주</p>
+
+<section class="card">
+  <div class="ri-list">
+    {% set vd = races | map(attribute='version') | unique | list %}
+    {% for r in races %}{{ race_card(r, version_label, true, true, vd | length > 1) }}{% endfor %}
+  </div>
+</section>
+
+{% endblock %}

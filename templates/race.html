@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+{% from "_macros.html" import version_badge, back_no, tactic_chip, ad with context %}
+
+{# 검색은 날짜보다 **선수 이름**으로 들어온다. 1순위를 제목에 넣는다.
+   블록은 자체 스코프라 바깥의 값을 받지 못한다 — 블록 안에서 구한다. #}
+{% block title %}{% set t1 = race.runners | sort(attribute='pred_rank') | first %}{{ race.race_ymd | date_ko }} {{ race.race_no }}R{% if t1 %} {{ t1.back_no }}번 {{ t1.racer_nm }}{% endif %} · 경륜 예상{% endblock %}
+{% block description %}{% set t1 = race.runners | sort(attribute='pred_rank') | first %}광명 {{ race.race_ymd | date_ko }} {{ race.race_no }}R 경륜 예상{% if t1 %} — 1순위 {{ t1.back_no }}번 {{ t1.racer_nm }} 승률 {{ t1.p_win | pct }}{% endif %}. 7명 전체 예측 승률과 전개 시뮬레이션, 출주표 상세.{% endblock %}
+
+{% block content %}
+
+<nav class="crumb">
+  <a href="{{ base }}/">예상</a> ›
+  <a href="{{ base }}/day/{{ race.race_ymd }}/">{{ race.race_ymd | date_ko }}</a> ›
+  <span>{{ race.race_no }}R</span>
+</nav>
+
+<section class="race-head">
+  <h1>{{ race.race_no }}R {{ version_badge(race.version, version_label) }}</h1>
+  <p class="meta">
+    {{ race.race_ymd | date_ko }} · 발주 {{ race.post_time or '—' }} ·
+    {{ race.meet_nm }} {{ race.stnd_yr }}년 {{ race.week_tcnt }}회차 {{ race.day_tcnt }}일차
+    {% if race.race_grade %}· <b>{{ race.race_grade }}급</b>{% endif %}
+    · {{ race.field_size or 7 }}명
+    {% if race.race_len %}· {{ '{:,}'.format(race.race_len) }}m{% endif %}
+    {% if race.round_cnt %}({{ race.round_cnt }}주회){% endif %}
+  </p>
+  {% if race.version == 'v1-oos' %}
+  <p class="warn-inline">
+    이 예상은 <strong>사후에 만든 모의 기록</strong>입니다. 그 경주 이전 자료만으로
+    학습한 모델이 만들었지만, 발주 전에 공개된 것은 아닙니다.
+  </p>
+  {% endif %}
+</section>
+
+{% if race.outcome %}
+<section class="card outcome {{ 'ok' if race.outcome.hit_win else 'no' }}">
+  <h2>결과</h2>
+  <p>
+    1순위로 꼽은 <b>{{ back_no(race.outcome.top1_back_no, "xs") }}{{ race.outcome.top1_racer }}</b>{{ race.outcome.top1_racer | jo('이/가') }}
+    {% if race.outcome.top1_ord and race.outcome.top1_ord > 0 %}<b>{{ race.outcome.top1_ord }}착</b>
+    {%- else %}착순 미확인{% endif %}.
+    {% if race.outcome.hit_win %}단승 적중.
+    {% elif race.outcome.hit_place %}단승은 빗나갔지만 2착 이내(연승 적중).
+    {% else %}빗나갔습니다.{% endif %}
+    {% if race.outcome.hit_quinella %} 복승 적중.{% endif %}
+    {% if race.outcome.hit_trio %} 삼복승 적중.{% endif %}
+  </p>
+</section>
+{% endif %}
+
+{# ── 예상판 ────────────────────────────────────────────────── #}
+<section class="card">
+  <h2>예측 승률 <span class="count">머신러닝 모델</span></h2>
+  <p class="note">
+    출주표의 전법·득점·최근 3회전 기록을 학습해 7명의 1착 확률을 산출합니다.
+    경주 안에서 합이 100%가 되도록 맞춘 값입니다.
+  </p>
+  <div class="board">
+    {% for r in race.runners | sort(attribute='pred_rank') %}
+    <div class="board-row {{ 'is-top' if r.pred_rank == 1 else '' }}">
+      <b class="mark" title="{{ r.mark_meaning }}">{{ r.mark or '·' }}</b>
+      {{ back_no(r.back_no, "m") }}
+      <span class="bname">{{ r.racer_nm }}<small>{{ r.grade_cur or r.racer_grd }} · {{ r.age }}세{% if r.main_tactic %} · {{ r.main_tactic }}형{% endif %}</small></span>
+      <span class="bar"><i style="width: {{ (r.p_win * 100) | round(1) }}%"></i></span>
+      <b class="bpct">{{ r.p_win | pct }}</b>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="legend small">
+    {% for m, meaning in mark_meaning.items() %}<span><b class="mark">{{ m }}</b> {{ meaning }}</span>{% endfor %}
+  </div>
+</section>
+
+{{ ad(adsense, 'slot_in_article') }}
+
+{# ── 라인 구도 ─────────────────────────────────────────────── #}
+{% set lines = race.runners | selectattr('line_group') | list %}
+{% if lines %}
+<section class="card">
+  <h2>라인 후보 <span class="count">훈련지 기준</span></h2>
+  <p class="note">
+    공개 자료에 <b>오늘 누가 누구와 라인을 짤 것인가</b>는 없습니다. 훈련지가
+    같은 선수를 묶어 <b>후보</b>로만 보여줍니다 — 실제 라인은 지역·선후배·그날의
+    판단으로 갈립니다.
+  </p>
+  <div class="lines">
+    {% for g, members in lines | groupby('line_group') %}
+    <div class="line line-{{ g }}">
+      <span class="line-plc">{{ members[0].trng_plc }}</span>
+      {% for m in members | sort(attribute='pred_rank') %}
+      <span class="line-m">{{ back_no(m.back_no, "s") }}{{ m.racer_nm }}
+        {{ tactic_chip(m.main_tactic) }}</span>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{# ── 전개 시뮬레이션 ───────────────────────────────────────── #}
+{% if race.sim and race.sim.script %}
+<section class="card">
+  <h2>
+    전개 시뮬레이션
+    <span class="conf conf-{{ race.sim.confidence.label }}">{{ race.sim.confidence.label }}</span>
+  </h2>
+  <p class="note">
+    마지막 1주회를 {{ '{:,}'.format(race.sim.n_sims) }}회 반복 계산했습니다.
+    앞사람 뒤에 붙으면 공기저항이 크게 줄어들므로 <b>앞에서 끌면 힘이 빨리 줄고,
+    뒤에 숨으면 마지막 직선에 쓸 힘이 남습니다.</b> 아래는 반복 계산에서 가장
+    자주 나온 전개이며, 실제 경주는 다르게 진행될 수 있습니다.
+  </p>
+
+  <ol class="scenes">
+    {% for sc in race.sim.script %}
+    <li class="scene">
+      <div class="scene-head"><b>{{ sc.title }}</b></div>
+      <div class="order-badges">
+        {% for n in sc.order %}
+        {% set m = (race.runners | selectattr('back_no', 'equalto', n) | first) %}
+        <span class="ob"><i class="rank">{{ loop.index }}</i>{{ back_no(n, "s") }}{{ m.racer_nm if m else '' }}</span>
+        {% endfor %}
+      </div>
+      <p class="scene-text">{{ sc.text }}</p>
+    </li>
+    {% endfor %}
+  </ol>
+
+  <p class="tactic">
+    이 경주에서 가장 자주 나온 전법은 <b>{{ race.sim.top_tactic }}</b> —
+    {{ race.sim.top_tactic_desc }}
+  </p>
+
+  <h3>누가 앞에서 끌고, 누가 힘을 남기나</h3>
+  <div class="scroll">
+  <table class="tbl">
+    <thead><tr><th>배번</th><th>선수</th><th class="r">주 전법</th>
+               <th class="r">타종 선두</th><th class="r">전개 승률</th>
+               <th class="r">예상 승률</th></tr></thead>
+    <tbody>
+      {% for b in race.sim.runners %}
+      {% set m = (race.runners | selectattr('back_no', 'equalto', b.back_no) | first) %}
+      <tr>
+        <td>{{ back_no(b.back_no, "s") }}</td>
+        <td>{{ b.racer_nm }}</td>
+        <td class="r">{{ tactic_chip(b.main_tactic) }}</td>
+        <td class="r">{{ b.lead_prob | pct }}</td>
+        <td class="r">{{ b.sim_win | pct }}</td>
+        <td class="r strong">{{ m.p_win | pct if m else '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  <p class="note">
+    전법 분포:
+    {% for name, share in race.sim.tactic_share.items() %}<span class="chip">{{ name }} {{ share | pct(0) }}</span> {% endfor %}
+  </p>
+  <p class="note">
+    드래프팅 절감률과 소모율은 <b>추정값</b>이라 초 단위 숫자는 믿을 수 없습니다.
+    믿을 수 있는 것은 순서와 부호입니다 — 앞에서 끌면 힘이 빨리 준다, 뒤에
+    붙으면 아낀다, 아낀 힘은 마지막 직선에서 속도가 된다.
+    <b>승률은 학습 모델이 산출하며, 시뮬레이션은 그 예상이 어떤 전개로
+    이어지는지를 보여줍니다.</b>
+  </p>
+</section>
+{% endif %}
+
+{# ── 체크 포인트 ───────────────────────────────────────────── #}
+{% if race.focus %}
+<section class="card">
+  <h2>체크 포인트</h2>
+  <div class="focus-grid">
+    {% for f in race.focus %}
+    <div class="focus">
+      <span class="flabel">{{ f.label }}</span>
+      <span class="fval">{{ back_no(f.back_no, "s") }}
+        {{ f.racer_nm }} <b>{{ f.value }}</b>
+        {% if f.sample %}<span class="dim">/ {{ f.sample }}</span>{% endif %}</span>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{# ── 전법 성향 ─────────────────────────────────────────────── #}
+<section class="card">
+  <h2>전법 성향</h2>
+  <p class="note">
+    입상했을 때 어떤 전법이었는가의 분포입니다. 횟수가 아니라 비율로 보아야
+    경력이 긴 선수와 짧은 선수를 같은 눈으로 볼 수 있습니다. 괄호 안이 횟수입니다.
+  </p>
+  <div class="tactics">
+    {% for r in race.runners | sort(attribute='pred_rank') %}
+    <div class="tt-row">
+      <b class="mark">{{ r.mark or '·' }}</b>
+      {{ back_no(r.back_no, "s") }}
+      <span class="bname">{{ r.racer_nm }}</span>
+      {% if r.tactic_total %}
+      <span class="tt-bar">
+        {% for t in r.tactics %}
+        {% if t.ratio %}
+        <i class="tt-{{ t.name }}" style="width: {{ (t.ratio * 100) | round(1) }}%"
+           title="{{ t.name }} {{ t.cnt }}회 ({{ t.ratio | pct(0) }})"></i>
+        {% endif %}
+        {% endfor %}
+      </span>
+      <span class="tt-txt">
+        {% for t in r.tactics %}{% if t.cnt %}{{ t.name }} {{ t.ratio | pct(0) }}({{ t.cnt }}){% if not loop.last %} · {% endif %}{% endif %}{% endfor %}
+      </span>
+      {% else %}
+      <span class="tt-txt dim">입상 이력 없음 — 성향을 말할 수 없습니다</span>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+{# ── 출주표 상세 ───────────────────────────────────────────── #}
+<section class="card">
+  <h2>출주표</h2>
+  <p class="note">
+    득점은 최근 성적을 점수로 환산한 값으로, 경륜에서 가장 강한 단일 지표입니다.
+    <b>광명</b> 열은 광명 경주만 따로 집계한 득점입니다.
+  </p>
+  <div class="scroll">
+  <table class="tbl tbl-card">
+    <thead>
+      <tr>
+        <th>배번</th><th>기호</th><th>선수</th><th>등급</th>
+        <th class="r">승률</th><th class="r">2착이내</th><th class="r">3착이내</th>
+        <th class="r">종합<br>득점</th><th class="r">광명<br>득점</th>
+        <th class="r">연대율</th><th class="r">삼연대</th>
+        <th class="r">200m</th><th class="r">기어</th>
+        <th>훈련지</th><th class="r">입상<br>/출전</th>
+        {% if race.outcome %}<th class="r">착순</th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in race.runners %}
+      <tr class="{{ 'winner' if r.is_winner else '' }}">
+        <td>{{ back_no(r.back_no, "s") }}</td>
+        <td><b class="mark" title="{{ r.mark_meaning }}">{{ r.mark }}</b></td>
+        <td class="c-name">{{ r.racer_nm }}<small>{{ r.age }}세 · {{ r.period_no }}기</small></td>
+        {# 등급 조정은 '이전→현재' 순으로 읽어야 방향이 보인다. 현재 등급을
+           먼저 적고 화살표를 뒤에 붙이면 어느 쪽이 지금인지 헷갈린다. #}
+        <td>{% if r.grade_bef and r.grade_cur and r.grade_bef != r.grade_cur %}
+          <small class="{{ 'up' if r.grade_cur < r.grade_bef else 'down' }}">{{ r.grade_bef }}→</small>
+          {% endif %}<span class="grd grd-{{ r.racer_grd }}">{{ r.grade_cur or '—' }}</span></td>
+        <td class="r strong">{{ r.p_win | pct }}</td>
+        <td class="r">{{ r.p_top2 | pct }}</td>
+        <td class="r">{{ r.p_top3 | pct }}</td>
+        <td class="r strong">{{ r.tot_avg_scr | num(1) }}</td>
+        <td class="r">{{ r.area_avg_scr | num(1) }}</td>
+        <td class="r">{{ r.high_rate | num(0) }}%</td>
+        <td class="r">{{ r.high_3_rate | num(0) }}%</td>
+        <td class="r">{{ r.rec_200m | num(2) }}</td>
+        <td class="r">{{ r.gear_rate | num(2) }}</td>
+        <td class="c-plc">{% if r.line_group %}<i class="line-dot line-{{ r.line_group }}"></i>{% endif %}{{ r.trng_plc or '—' }}</td>
+        <td class="r">{{ r.win_tot_cnt }}<span class="dim">/{{ r.run_day_cnt }}</span></td>
+        {% if race.outcome %}
+        <td class="r">
+          {%- if r.ord and r.ord > 0 %}<span class="ord ord-{{ r.ord }}">{{ r.ord }}</span>
+          {%- else %}—{% endif %}</td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+
+{# ── 최근 3회전 ────────────────────────────────────────────── #}
+<section class="card">
+  <h2>최근 3회전 착순</h2>
+  <p class="note">
+    회차는 3일 편성이라 회전마다 착순이 셋입니다. 왼쪽이 과거, 오른쪽이 최근.
+    1·2착을 강조합니다. 빈칸은 <b>결장</b>이며 나쁜 성적이 아니라 성적 없음입니다.
+  </p>
+  <div class="forms">
+    {% for r in race.runners | sort(attribute='pred_rank') %}
+    <div class="form-row">
+      <b class="mark">{{ r.mark or '·' }}</b>
+      {{ back_no(r.back_no, "s") }}
+      <span class="bname">{{ r.racer_nm }}<small>{{ r.grade_cur }}</small></span>
+      <span class="band">
+        {% for g in r.recent %}
+        <span class="band-g" title="{{ g.meet or '' }} {{ g.date or '' }}">
+          {% for v in g.ranks %}
+          {% if v %}<i class="r{{ v }}">{{ v }}</i>{% else %}<i class="rx" title="결장">·</i>{% endif %}
+          {% endfor %}
+          <small>{{ g.meet or '' }}{% if g.date %} {{ g.date }}{% endif %}</small>
+        </span>
+        {% endfor %}
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% if race.combos %}
+<section class="card">
+  <h2>확률을 승식으로 옮기면</h2>
+  <p class="note">
+    위 확률을 승식 형태로 옮긴 참고 표기입니다. 모든 방식의 장기 회수율은
+    100% 미만입니다 — <a href="{{ base }}/strategy/">승식별 실측 회수율</a>.
+  </p>
+  <ul class="combos">
+    {% for c in race.combos %}
+    <li><b>{{ c.label }}</b> <code>{{ c.value }}</code> <span class="dim">{{ c.note }}</span></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if race.payoffs %}
+<section class="card">
+  <h2>확정 배당</h2>
+  <div class="scroll">
+  <table class="tbl tbl-pay">
+    <thead><tr><th>승식</th><th>적중 조합</th><th class="r">배당</th></tr></thead>
+    <tbody>
+      {% for p in race.payoffs %}
+      <tr><td>{{ p.pool }}</td><td><code>{{ p.combo or '—' }}</code></td>
+          <td class="r">{{ p.payout | num(1) }}배</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  <p class="note">
+    배당률 API 는 배당값만 주고 조합은 주지 않습니다. 조합 칸이 비어 있는 것은
+    자료가 없다는 뜻입니다. 이름을 확인하지 못한 승식 칸 둘(pool7·pool8)은
+    표에 올리지 않았습니다 — 이름을 잘못 붙이면 틀렸다는 것조차 알 수 없습니다.
+  </p>
+</section>
+{% endif %}
+
+{{ ad(adsense, 'slot_bottom') }}
+
+{% endblock %}

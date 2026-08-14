@@ -1,0 +1,311 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "서울올림픽기념 국민체육진흥공단에서 제공하는 경륜 배당률 관련 Open API는 경주일, 경주번호를 기준으로 단승, 연승 등의 배당 정보를 조회할 수 있는 서비스입니다. 이 API를 통해 사용자는 특정 일자 및 경주에 대한 배당률 정보를 손쉽게 조회할 수 있으며, 배당률 변화 추이 분석이나 경기 예측에 활용할 수 있습니다. 또한 경륜 관련 콘텐츠 제작, 경기 정보 안내, 데이터 기반의 분석 및 예측 시스템 개발 등 다양한 용도로 유용하게 활용됩니다. 공공데이터로 제공되므로 누구나 접근 가능하며, 스포츠 산업의 데이터 활용 가치를 높이는 데 기여하고 있습니다.\n",
+    "version": "1.0.0",
+    "title": "서울올림픽기념국민체육진흥공단_경주사업총괄본부 경륜-배당률_GW"
+  },
+  "host": "apis.data.go.kr/B551014/SRVC_OD_API_CRA_PAYOFF",
+  "basePath": "",
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/TODZ_API_CRA_PAYOFF_I": {
+      "get": {
+        "responses": {
+          "0": {
+            "description": "NORMAL SERVICE / 정상 수행 입니다.."
+          },
+          "10": {
+            "description": "INVALID_REQUEST_PARAMETER_ERROR / 잘못된 요청 파라메터 에러"
+          },
+          "200": {
+            "description": "성공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "header": {
+                  "$ref": "#/definitions/API_CRA_PAYOFF_I-header"
+                },
+                "body": {
+                  "$ref": "#/definitions/API_CRA_PAYOFF_I-body"
+                }
+              },
+              "xml": {
+                "name": "response"
+              }
+            }
+          },
+          "301": {
+            "description": "INVALID REQUEST RESULT TYPE / 잘못된 결과형태 요청"
+          },
+          "334": {
+            "description": "START PAGE NUMBER GREATER THAN LAST PAGE NUMBER / 시작 페이지 숫자가 끝 페이지 숫자보다 큼"
+          },
+          "336": {
+            "description": "CANNOT REQUEST MORE THAN 1000 DATA AT A TIME / 한번에 1000건 이상의 요청은 할 수 없음"
+          },
+          "340": {
+            "description": "NO MANDATORY REQUEST PARAMETERS ERROR / 필수 요청 파라미터가 입력되지 않거나 부적절한 값이 입력되었음"
+          },
+          "500": {
+            "description": "INTERNAL_SERVER_ERROR / 내부 서버 오류"
+          },
+          "601": {
+            "description": "INVALID_OPEN_API_OPERATION_ERROR / 잘못된 오픈 API 작동 오류"
+          }
+        },
+        "tags": [
+          "API 목록"
+        ],
+        "summary": "경륜배당률 목록조회",
+        "description": "경륜배당률 목록조회",
+        "operationId": "TODZ_API_CRA_PAYOFF_I",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "serviceKey",
+          "description": "공공데이터포털에서 받은 인증키",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "pageNo",
+          "description": "페이지번호",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "numOfRows",
+          "description": "한 페이지 결과 수",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "resultType",
+          "description": "결과형식",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "stnd_yr",
+          "description": "경기연도",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "week_tcnt",
+          "description": "등록회차수",
+          "type": "number",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "day_tcnt",
+          "description": "경기회차수",
+          "type": "number",
+          "required": false,
+          "in": "query"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "API_CRA_PAYOFF_I-items": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/API_CRA_PAYOFF_I-item"
+        }
+      }
+    },
+    "API_CRA_PAYOFF_I-item": {
+      "type": "object",
+      "properties": {
+        "stnd_yr": {
+          "type": "string",
+          "description": "경기연도"
+        },
+        "race_ymd": {
+          "type": "string",
+          "description": "경주일자"
+        },
+        "race_no": {
+          "type": "string",
+          "description": "경주번호"
+        },
+        "pool1_val": {
+          "type": "string",
+          "description": "단승식값"
+        },
+        "pool2_1_val": {
+          "type": "string",
+          "description": "연승식1값"
+        },
+        "pool2_2_val": {
+          "type": "string",
+          "description": "연승식2값"
+        },
+        "pool4_val": {
+          "type": "string",
+          "description": "쌍승식값"
+        },
+        "pool5_val": {
+          "type": "string",
+          "description": "복승식값"
+        },
+        "pool6_val": {
+          "type": "string",
+          "description": "삼복승식값"
+        },
+        "week_tcnt": {
+          "type": "number",
+          "description": "등록회차수"
+        },
+        "day_tcnt": {
+          "type": "number",
+          "description": "경기회차수"
+        },
+        "row_num": {
+          "type": "string",
+          "description": "순번"
+        }
+      }
+    },
+    "API_CRA_PAYOFF_I-body": {
+      "type": "object",
+      "properties": {
+        "numOfRows": {
+          "type": "string",
+          "description": "한 페이지 결과 수"
+        },
+        "items": {
+          "$ref": "#/definitions/API_CRA_PAYOFF_I-items"
+        },
+        "pageNo": {
+          "type": "string",
+          "description": "페이지번호"
+        },
+        "totalCount": {
+          "type": "string",
+          "description": "전체 결과 수"
+        }
+      }
+    },
+    "API_CRA_PAYOFF_I-header": {
+      "type": "object",
+      "properties": {
+        "resultMsg": {
+          "type": "string",
+          "description": "결과메시지"
+        },
+        "resultCode": {
+          "type": "string",
+          "description": "결과코드"
+        }
+      }
+    }
+  },
+  "swaggerOprtinVOs": [
+    {
+      "oprtinUrl": "https://openapi.kspo.or.kr/web/service/SRVC_OD_API_CRA_PAYOFF/TODZ_API_CRA_PAYOFF_I",
+      "oprtinNm": "경륜배당률 목록조회",
+      "oprtinDc": "경륜배당률 목록조회",
+      "gwSvcNm": "TODZ_API_CRA_PAYOFF_I",
+      "operationId": "TODZ_API_CRA_PAYOFF_I",
+      "publicDataTyDetailCode": "PRDE02",
+      "reqList": [
+        {
+          "paramtrNm": "serviceKey",
+          "paramtrDc": "공공데이터포털에서 받은 인증키",
+          "paramtrBassValue": "-",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "pageNo",
+          "paramtrDc": "페이지번호",
+          "paramtrBassValue": "1",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "numOfRows",
+          "paramtrDc": "한 페이지 결과 수",
+          "paramtrBassValue": "10",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "resultType",
+          "paramtrDc": "결과형식",
+          "paramtrBassValue": "XML",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "stnd_yr",
+          "paramtrDc": "경기연도",
+          "paramtrBassValue": "2015",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "week_tcnt",
+          "paramtrDc": "등록회차수",
+          "paramtrBassValue": "45",
+          "paramtrTy": "number",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "day_tcnt",
+          "paramtrDc": "경기회차수",
+          "paramtrBassValue": "3",
+          "paramtrTy": "number",
+          "paramtrDivision": "옵션",
+          "ck": true
+        }
+      ],
+      "resList": [
+        {
+          "paramtrNm": "header",
+          "paramtrDc": "header",
+          "paramtrDefNm": "#/definitions/API_CRA_PAYOFF_I-header",
+          "subDefNm": "API_CRA_PAYOFF_I-header",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "body",
+          "paramtrDc": "body",
+          "paramtrDefNm": "#/definitions/API_CRA_PAYOFF_I-body",
+          "subDefNm": "API_CRA_PAYOFF_I-body",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true
+        }
+      ]
+    }
+  ]
+}

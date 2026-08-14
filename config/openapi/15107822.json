@@ -1,0 +1,299 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "경륜-선수 상대전적 정보는 서울올림픽기념국민체육진흥공단 경륜경정총괄본부에서 제공하는 데이터로, 특정 선수가 특정 상대와 맞붙었을 때의 승리, 패배, 무승부 횟수는 물론, 두 선수가 함께 입상한 동반입상 횟수까지 확인할 수 있는 유용한 정보입니다. OPEN API를 통해 연도별, 경륜장별로 조회가 가능하며, 선수명과 상대선수명을 기준으로 전적 데이터를 손쉽게 검색할 수 있어 분석 및 예측에 매우 효과적입니다. 선수 간의 궁합이나 상성, 주행 스타일의 상호 영향 등을 평가할 수 있으며, 팬이나 분석가들이 경기 흐름을 파악하고 전략을 세우는 데 핵심적인 자료로 활용됩니다.",
+    "version": "1.0.0",
+    "title": "서울올림픽기념국민체육진흥공단_경주사업총괄본부 경륜-선수 상대전적 정보_GW"
+  },
+  "host": "apis.data.go.kr/B551014/SRVC_OD_API_CRA_OPPO_WIN",
+  "basePath": "",
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/todz_api_cra_oppo_win_i": {
+      "get": {
+        "responses": {
+          "0": {
+            "description": "NORMAL SERVICE / 정상 수행 입니다.."
+          },
+          "10": {
+            "description": "INVALID_REQUEST_PARAMETER_ERROR / 잘못된 요청 파라메터 에러"
+          },
+          "200": {
+            "description": "성공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "header": {
+                  "$ref": "#/definitions/api_cra_oppo_win_i-header"
+                },
+                "body": {
+                  "$ref": "#/definitions/api_cra_oppo_win_i-body"
+                }
+              },
+              "xml": {
+                "name": "response"
+              }
+            }
+          },
+          "301": {
+            "description": "INVALID REQUEST RESULT TYPE / 잘못된 결과형태 요청"
+          },
+          "334": {
+            "description": "START PAGE NUMBER GREATER THAN LAST PAGE NUMBER / 시작 페이지 숫자가 끝 페이지 숫자보다 큼"
+          },
+          "336": {
+            "description": "CANNOT REQUEST MORE THAN 1000 DATA AT A TIME / 한번에 1000건 이상의 요청은 할 수 없음"
+          },
+          "340": {
+            "description": "NO MANDATORY REQUEST PARAMETERS ERROR / 필수 요청 파라미터가 입력되지 않거나 부적절한 값이 입력되었음"
+          },
+          "500": {
+            "description": "INTERNAL_SERVER_ERROR / 내부 서버 오류"
+          },
+          "601": {
+            "description": "INVALID_OPEN_API_OPERATION_ERROR / 잘못된 오픈 API 작동 오류"
+          }
+        },
+        "tags": [
+          "API 목록"
+        ],
+        "summary": "경륜선수별 상대전적 및 동반입상횟수 조회",
+        "description": "년도,선수명, 상대선수명 등의 조회조건을 이용해 서울올림픽기념국민체육진흥공단 기금조성총괄본부에서 진행한 경륜경주의 선수별 상대전적 및 동반입상횟수를 조회하는 기능",
+        "operationId": "todz_api_cra_oppo_win_i",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "serviceKey",
+          "description": "공공데이터포털에서 받은 인증키",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "pageNo",
+          "description": "페이지번호",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "numOfRows",
+          "description": "한 페이지 결과 수",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "resultType",
+          "description": "결과형식",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "stnd_yr",
+          "description": "경기연도",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "racer_nm",
+          "description": "선수명",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "oppo_racer_nm",
+          "description": "상대선수명",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "api_cra_oppo_win_i-header": {
+      "type": "object",
+      "properties": {
+        "resultCode": {
+          "type": "string",
+          "description": "결과코드"
+        },
+        "resultMsg": {
+          "type": "string",
+          "description": "결과메시지"
+        }
+      }
+    },
+    "api_cra_oppo_win_i-body": {
+      "type": "object",
+      "properties": {
+        "pageNo": {
+          "type": "string",
+          "description": "페이지번호"
+        },
+        "totalCount": {
+          "type": "string",
+          "description": "전체 결과 수"
+        },
+        "numOfRows": {
+          "type": "string",
+          "description": "한 페이지 결과 수"
+        },
+        "items": {
+          "$ref": "#/definitions/api_cra_oppo_win_i-items"
+        }
+      }
+    },
+    "api_cra_oppo_win_i-items": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/api_cra_oppo_win_i-item"
+        }
+      }
+    },
+    "api_cra_oppo_win_i-item": {
+      "type": "object",
+      "properties": {
+        "stnd_yr": {
+          "type": "string",
+          "description": "경기연도"
+        },
+        "meet_nm": {
+          "type": "string",
+          "description": "경륜장명"
+        },
+        "racer_nm": {
+          "type": "string",
+          "description": "선수명"
+        },
+        "oppo_racer_nm": {
+          "type": "string",
+          "description": "상대선수명"
+        },
+        "win_tcnt": {
+          "type": "number",
+          "description": "승리횟수"
+        },
+        "lose_tcnt": {
+          "type": "number",
+          "description": "패배횟수"
+        },
+        "draw_tcnt": {
+          "type": "number",
+          "description": "무승부횟수"
+        },
+        "same_win_tcnt": {
+          "type": "number",
+          "description": "동반입상횟수"
+        },
+        "row_num": {
+          "type": "string",
+          "description": "순번"
+        }
+      }
+    }
+  },
+  "swaggerOprtinVOs": [
+    {
+      "oprtinUrl": "https://openapi.kspo.or.kr/web/service/SRVC_OD_API_CRA_OPPO_WIN/todz_api_cra_oppo_win_i",
+      "oprtinNm": "경륜선수별 상대전적 및 동반입상횟수 조회",
+      "oprtinDc": "년도,선수명, 상대선수명 등의 조회조건을 이용해 서울올림픽기념국민체육진흥공단 기금조성총괄본부에서 진행한 경륜경주의 선수별 상대전적 및 동반입상횟수를 조회하는 기능",
+      "gwSvcNm": "todz_api_cra_oppo_win_i",
+      "operationId": "todz_api_cra_oppo_win_i",
+      "publicDataTyDetailCode": "PRDE02",
+      "reqList": [
+        {
+          "paramtrNm": "serviceKey",
+          "paramtrDc": "공공데이터포털에서 받은 인증키",
+          "paramtrBassValue": "-",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "pageNo",
+          "paramtrDc": "페이지번호",
+          "paramtrBassValue": "1",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "numOfRows",
+          "paramtrDc": "한 페이지 결과 수",
+          "paramtrBassValue": "10",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "resultType",
+          "paramtrDc": "결과형식",
+          "paramtrBassValue": "XML",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "stnd_yr",
+          "paramtrDc": "경기연도",
+          "paramtrBassValue": "2020",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "racer_nm",
+          "paramtrDc": "선수명",
+          "paramtrBassValue": "허은회",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "oppo_racer_nm",
+          "paramtrDc": "상대선수명",
+          "paramtrBassValue": "김영규",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        }
+      ],
+      "resList": [
+        {
+          "paramtrNm": "header",
+          "paramtrDc": "header",
+          "paramtrDefNm": "#/definitions/api_cra_oppo_win_i-header",
+          "subDefNm": "api_cra_oppo_win_i-header",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "body",
+          "paramtrDc": "body",
+          "paramtrDefNm": "#/definitions/api_cra_oppo_win_i-body",
+          "subDefNm": "api_cra_oppo_win_i-body",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true
+        }
+      ]
+    }
+  ]
+}

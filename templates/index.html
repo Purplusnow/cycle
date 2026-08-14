@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% from "_macros.html" import race_card, version_badge, back_no, ad with context %}
+
+{# 검색 결과에 그대로 나가는 자리다. 사이트 이름만 적으면 '경륜 예상' 으로
+   찾는 사람과 이어지지 않는다. 무엇을 하는 곳인지 앞에 둔다. #}
+{% block title %}경륜 예상 · 광명 승률 예측과 적중률 검증{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <h1>경륜 승률 예측</h1>
+  <p class="lede">
+    출주표의 선수 전법·득점·최근 3회전 기록 {{ metrics.n_features or 106 }}개 지표를
+    머신러닝 모델로 학습해 7명의 승률을 산출합니다. 예상은
+    <strong>발주 전에 확정 저장</strong>하며, 실제 결과·배당과 대조한 성적을
+    함께 공개합니다.
+  </p>
+
+  {% if metrics.hit_win %}
+  <div class="stats">
+    <div class="stat">
+      <b>{{ metrics.hit_win | pct }}</b>
+      <span>1순위 1착</span>
+      <small>득점 최고 {{ metrics.score_win | pct }}</small>
+    </div>
+    <div class="stat">
+      <b>{{ metrics.hit_place | pct }}</b>
+      <span>1순위 2착 이내</span>
+      <small>연승 기준</small>
+    </div>
+    <div class="stat">
+      <b class="minus">{{ metrics.roi_win | pct }}</b>
+      <span>단승 회수율</span>
+      <small>100% 미만 = 손실</small>
+    </div>
+    <div class="stat">
+      <b>{{ '{:,}'.format(metrics.verified_races) }}</b>
+      <span>검증 경주</span>
+      <small>시간순 교차검증</small>
+    </div>
+  </div>
+
+  {# **이 문단이 이 사이트에서 가장 정직해야 하는 자리다.**
+     경륜은 득점 하나로 대부분 설명되는 종목이라, '적중률 60%' 만 크게 적으면
+     모델이 한 일이 거의 없다는 사실을 감출 수 있다. 베이스라인을 같은 크기로
+     옆에 둔다. #}
+  <p class="baseline-note">
+    경륜은 <strong>득점이 결과를 크게 좌우하는 종목</strong>입니다. 출주표의
+    종합 평균득점이 가장 높은 선수를 그냥 찍기만 해도
+    <b>{{ metrics.score_win | pct }}</b> 가 맞습니다. 이 모델은
+    <b>{{ metrics.hit_win | pct }}</b> 로, 그 차이인
+    <b>{{ (metrics.edge_win * 100) | round(1) }}%p</b> 가 전법·라인·최근 성적을
+    함께 본 몫입니다. 큰 차이가 아니라는 점을 먼저 적어 둡니다.
+    {% if metrics.back1_win %}
+    참고로 배번 1번을 고정으로 찍으면 {{ metrics.back1_win | pct }} 입니다 —
+    무작위(14.3%)와 크게 다르지 않아, <strong>경륜에서 자리는 유리함이
+    아닙니다</strong>.
+    {% endif %}
+  </p>
+
+  <p class="fineprint">
+    학습 {{ '{:,}'.format(metrics.trained_races) }}경주 · 지표
+    {{ metrics.n_features }}개 · AUC {{ metrics.auc | num(3) }} ·
+    자료 {{ metrics.date_max }} 기준. 적중률은 <strong>시간순 교차검증</strong>
+    결과이며, 검증 대상 경주는 학습에 포함하지 않았습니다.
+  </p>
+  {% endif %}
+</section>
+
+{% if highlights and highlights.recent %}
+<section class="card">
+  <h2>고배당 적중 <span class="count">검증 기록</span></h2>
+  <div class="hl-grid">
+    {% for h in highlights.recent %}
+    {% if h.has_page %}<a class="hl" href="{{ base }}/race/{{ h.race_key }}/">{% else %}<div class="hl">{% endif %}
+      <b class="hl-odds">{{ h.odds }}<i>배</i></b>
+      <span class="hl-bet">{{ h.bet }}</span>
+      <span class="hl-meta">{{ h.date }} · {{ h.race_no }}R</span>
+      <span class="hl-pick">{{ back_no(h.back_no, "xs") }}{{ h.racer }}</span>
+    {% if h.has_page %}</a>{% else %}</div>{% endif %}
+    {% endfor %}
+  </div>
+  <p class="note">
+    실제 확정배당으로 계산한 <b>시간순 교차검증 기록</b>입니다. 각 경주 이전
+    자료만으로 학습한 모델의 예상이며, 발주 전에 공개된 기록은 아닙니다.
+    <a href="{{ base }}/accuracy/">전체 적중률과 회수율 →</a>
+  </p>
+</section>
+{% endif %}
+
+{% if upcoming %}
+{% set days = upcoming | map(attribute='race_ymd') | select | unique | list %}
+<section class="card">
+  <h2>
+    {% if days | length == 1 %}{{ days[0] | date_ko }}
+    {% elif days | length > 1 %}{{ days[0] | date_ko }} ~ {{ days[-1] | date_ko }}
+    {% else %}예정 경주{% endif %}
+    <span class="count">{{ upcoming | length }}경주</span>
+  </h2>
+  <div class="ri-list">
+    {% set vs = upcoming | map(attribute='version') | unique | list %}
+    {% for r in upcoming %}{{ race_card(r, version_label, true, true, vs | length > 1) }}{% endfor %}
+  </div>
+</section>
+{% else %}
+<section class="card empty">
+  <h2>예정된 경주 없음</h2>
+  <p>다음 개최일 출주표가 공개되면 이곳에 게시됩니다.</p>
+</section>
+{% endif %}
+
+{{ ad(adsense, 'slot_top') }}
+
+{% if day_list %}
+<section class="card">
+  <h2>경주일</h2>
+  <div class="chips">
+    {% for d in day_list %}<a class="chip chip-link" href="{{ base }}/day/{{ d }}/">{{ d | date_ko }}</a>{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if finished %}
+<section class="card">
+  <h2>최근 결과</h2>
+  <p class="note">
+    적중·불발을 모두 기록합니다. <a href="{{ base }}/results/">전체 결과 →</a>
+  </p>
+  <div class="ri-list">
+    {% set vf = finished | map(attribute='version') | unique | list %}
+    {% for r in finished %}{{ race_card(r, version_label, true, false, vf | length > 1, true) }}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>기호</h2>
+  <div class="legend">
+    {% for m, meaning in mark_meaning.items() %}
+    <span><b class="mark">{{ m }}</b> {{ meaning }}</span>
+    {% endfor %}
+  </div>
+  <p class="note">
+    ★ 는 1순위의 2착 이내 확률이 {{ star_threshold | pct(0) }} 이상인 경주에만
+    부여합니다. 기준은 과거 18,968경주로 보정했으며, ★ 경주의 실적은
+    1착 81.8% · 2착 이내 92.0%(전체 경주의 19%)입니다. 일곱 명 중 넷에만
+    기호를 붙입니다 — 다섯에 붙으면 기호가 아무것도 가리지 않습니다.
+  </p>
+</section>
+
+<section class="card">
+  <h2>전법</h2>
+  <p class="note">
+    경륜에서 승부를 가르는 축입니다. 자리(배번)가 아니라 <b>언제 바람을 맞기
+    시작하느냐</b>의 선택입니다.
+  </p>
+  <div class="legend legend-tactic">
+    {% for name, desc in tactic_desc.items() %}
+    <span><b class="tc tc-{{ name }}">{{ name }}</b> {{ desc }}</span>
+    {% endfor %}
+  </div>
+</section>
+
+{{ ad(adsense, 'slot_bottom') }}
+
+{% endblock %}

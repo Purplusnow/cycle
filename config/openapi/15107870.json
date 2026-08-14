@@ -1,0 +1,891 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "경륜-운영정보는 서울올림픽기념국민체육진흥공단 경륜경정총괄본부에서 운영하는 경륜경주의 관리 및 유지보수에 관련된 데이터를 제공하는 공공 API 서비스입니다. 이 데이터는 경륜 운영의 핵심인 자전거와 관련된 세부 정보를 포함하고 있으며, 특히 선수별 자전거 파손 이력(교체, 정비 여부)을 연도 및 회차별로 확인할 수 있습니다. 또한 선수의 입소일과 출주 전·직전·후에 수행된 점검 내용을 함께 조회할 수 있어, 선수 장비의 상태와 정비 주기를 분석할 수 있습니다. 이는 경기 전반의 안전성과 성능 유지에 중요한 자료로, 훈련 수준과 출전 조건의 이해에도 도움을 줍니다. 경륜 장비 관리의 투명성과 경기 품질 향상에 기여하는 유용한 데이터입니다.",
+    "version": "1.0.0",
+    "title": "서울올림픽기념국민체육진흥공단_경주사업총괄본부 경륜-운영 정보_GW"
+  },
+  "host": "apis.data.go.kr/B551014/SRVC_OD_API_CRA_CYCLE_EXER",
+  "basePath": "",
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/TODZ_API_CRA_CYCLE_EXER_I": {
+      "get": {
+        "responses": {
+          "0": {
+            "description": "NORMAL SERVICE / 정상 수행 입니다.."
+          },
+          "10": {
+            "description": "INVALID_REQUEST_PARAMETER_ERROR / 잘못된 요청 파라메터 에러"
+          },
+          "200": {
+            "description": "성공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "header": {
+                  "$ref": "#/definitions/API_CRA_CYCLE_EXER_I-header"
+                },
+                "body": {
+                  "$ref": "#/definitions/API_CRA_CYCLE_EXER_I-body"
+                }
+              },
+              "xml": {
+                "name": "response"
+              }
+            }
+          },
+          "301": {
+            "description": "INVALID REQUEST RESULT TYPE / 잘못된 결과형태 요청"
+          },
+          "334": {
+            "description": "START PAGE NUMBER GREATER THAN LAST PAGE NUMBER / 시작 페이지 숫자가 끝 페이지 숫자보다 큼"
+          },
+          "336": {
+            "description": "CANNOT REQUEST MORE THAN 1000 DATA AT A TIME / 한번에 1000건 이상의 요청은 할 수 없음"
+          },
+          "340": {
+            "description": "NO MANDATORY REQUEST PARAMETERS ERROR / 필수 요청 파라미터가 입력되지 않거나 부적절한 값이 입력되었음"
+          },
+          "500": {
+            "description": "INTERNAL_SERVER_ERROR / 내부 서버 오류"
+          },
+          "601": {
+            "description": "INVALID_OPEN_API_OPERATION_ERROR / 잘못된 오픈 API 작동 오류"
+          }
+        },
+        "tags": [
+          "API 목록"
+        ],
+        "summary": "경주일 조조연습현황 조회",
+        "description": "년도, 회차, 경주일차, 경주일 등 검색조건을 지정하여 조조 연습 현황 정보를 조회하는 기능",
+        "operationId": "TODZ_API_CRA_CYCLE_EXER_I",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "serviceKey",
+          "description": "공공데이터포털에서 받은 인증키",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "pageNo",
+          "description": "페이지번호",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "numOfRows",
+          "description": "한 페이지 결과 수",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "resultType",
+          "description": "결과형식",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "stnd_yr",
+          "description": "경기연도",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "week_tcnt",
+          "description": "등록회차수",
+          "type": "number",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "day_tcnt",
+          "description": "경기회차수",
+          "type": "number",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "race_ymd",
+          "description": "경주일자",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        }
+      ]
+    },
+    "/TODZ_API_CRA_CYCLE_PART_I": {
+      "get": {
+        "responses": {
+          "0": {
+            "description": "NORMAL SERVICE / 정상 수행 입니다.."
+          },
+          "10": {
+            "description": "INVALID_REQUEST_PARAMETER_ERROR / 잘못된 요청 파라메터 에러"
+          },
+          "200": {
+            "description": "성공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "header": {
+                  "$ref": "#/definitions/API_CRA_CYCLE_PART_I-header"
+                },
+                "body": {
+                  "$ref": "#/definitions/API_CRA_CYCLE_PART_I-body"
+                }
+              },
+              "xml": {
+                "name": "response"
+              }
+            }
+          },
+          "301": {
+            "description": "INVALID REQUEST RESULT TYPE / 잘못된 결과형태 요청"
+          },
+          "334": {
+            "description": "START PAGE NUMBER GREATER THAN LAST PAGE NUMBER / 시작 페이지 숫자가 끝 페이지 숫자보다 큼"
+          },
+          "336": {
+            "description": "CANNOT REQUEST MORE THAN 1000 DATA AT A TIME / 한번에 1000건 이상의 요청은 할 수 없음"
+          },
+          "340": {
+            "description": "NO MANDATORY REQUEST PARAMETERS ERROR / 필수 요청 파라미터가 입력되지 않거나 부적절한 값이 입력되었음"
+          },
+          "500": {
+            "description": "INTERNAL_SERVER_ERROR / 내부 서버 오류"
+          },
+          "601": {
+            "description": "INVALID_OPEN_API_OPERATION_ERROR / 잘못된 오픈 API 작동 오류"
+          }
+        },
+        "tags": [
+          "API 목록"
+        ],
+        "summary": "자전거 부품정보 목록 조회",
+        "description": "자전거 대분류 또는 소분류 부품명 검색조건을 지정하여 경륜운영 사업에 필요한 자전거 푸품 정보를 조회하는 기능",
+        "operationId": "TODZ_API_CRA_CYCLE_PART_I",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "serviceKey",
+          "description": "공공데이터포털에서 받은 인증키",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "pageNo",
+          "description": "페이지번호",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "numOfRows",
+          "description": "한 페이지 결과 수",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "resultType",
+          "description": "결과형식",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "mstr_unit_nm",
+          "description": "대분류부품명",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "salv_unit_nm",
+          "description": "소분류부품명",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        }
+      ]
+    },
+    "/TODZ_API_CRA_INSPECT_I": {
+      "get": {
+        "responses": {
+          "0": {
+            "description": "NORMAL SERVICE / 정상 수행 입니다.."
+          },
+          "10": {
+            "description": "INVALID_REQUEST_PARAMETER_ERROR / 잘못된 요청 파라메터 에러"
+          },
+          "200": {
+            "description": "성공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "header": {
+                  "$ref": "#/definitions/API_CRA_INSPECT_I-header"
+                },
+                "body": {
+                  "$ref": "#/definitions/API_CRA_INSPECT_I-body"
+                }
+              },
+              "xml": {
+                "name": "response"
+              }
+            }
+          },
+          "301": {
+            "description": "INVALID REQUEST RESULT TYPE / 잘못된 결과형태 요청"
+          },
+          "334": {
+            "description": "START PAGE NUMBER GREATER THAN LAST PAGE NUMBER / 시작 페이지 숫자가 끝 페이지 숫자보다 큼"
+          },
+          "336": {
+            "description": "CANNOT REQUEST MORE THAN 1000 DATA AT A TIME / 한번에 1000건 이상의 요청은 할 수 없음"
+          },
+          "340": {
+            "description": "NO MANDATORY REQUEST PARAMETERS ERROR / 필수 요청 파라미터가 입력되지 않거나 부적절한 값이 입력되었음"
+          },
+          "500": {
+            "description": "INTERNAL_SERVER_ERROR / 내부 서버 오류"
+          },
+          "601": {
+            "description": "INVALID_OPEN_API_OPERATION_ERROR / 잘못된 오픈 API 작동 오류"
+          }
+        },
+        "tags": [
+          "API 목록"
+        ],
+        "summary": "검차 운영정보 목록 조회",
+        "description": "년도와 경륜 회차 검색조건을 경륜 검차 후 부품 처리 정보를 조회하는 기능",
+        "operationId": "TODZ_API_CRA_INSPECT_I",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "serviceKey",
+          "description": "공공데이터포털에서 받은 인증키",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "pageNo",
+          "description": "페이지번호",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "numOfRows",
+          "description": "한 페이지 결과 수",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "resultType",
+          "description": "결과형식",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "stnd_yr",
+          "description": "경기연도",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "week_tcnt",
+          "description": "등록회차수",
+          "type": "number",
+          "required": true,
+          "in": "query"
+        }
+      ]
+    },
+    "/TODZ_API_CRA_INOUT_I": {
+      "get": {
+        "responses": {
+          "0": {
+            "description": "NORMAL SERVICE / 정상 수행 입니다.."
+          },
+          "10": {
+            "description": "INVALID_REQUEST_PARAMETER_ERROR / 잘못된 요청 파라메터 에러"
+          },
+          "200": {
+            "description": "성공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "header": {
+                  "$ref": "#/definitions/API_CRA_INOUT_I-header"
+                },
+                "body": {
+                  "$ref": "#/definitions/API_CRA_INOUT_I-body"
+                }
+              },
+              "xml": {
+                "name": "response"
+              }
+            }
+          },
+          "301": {
+            "description": "INVALID REQUEST RESULT TYPE / 잘못된 결과형태 요청"
+          },
+          "334": {
+            "description": "START PAGE NUMBER GREATER THAN LAST PAGE NUMBER / 시작 페이지 숫자가 끝 페이지 숫자보다 큼"
+          },
+          "336": {
+            "description": "CANNOT REQUEST MORE THAN 1000 DATA AT A TIME / 한번에 1000건 이상의 요청은 할 수 없음"
+          },
+          "340": {
+            "description": "NO MANDATORY REQUEST PARAMETERS ERROR / 필수 요청 파라미터가 입력되지 않거나 부적절한 값이 입력되었음"
+          },
+          "500": {
+            "description": "INTERNAL_SERVER_ERROR / 내부 서버 오류"
+          },
+          "601": {
+            "description": "INVALID_OPEN_API_OPERATION_ERROR / 잘못된 오픈 API 작동 오류"
+          }
+        },
+        "tags": [
+          "API 목록"
+        ],
+        "summary": "자전거 보관현황 목록 조회",
+        "description": "년도, 회차, 일차 등의 검색조건을 지정하여 경륜운영 사업 관련 자전거 보관 현황 정보를 조회 기능",
+        "operationId": "TODZ_API_CRA_INOUT_I",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "serviceKey",
+          "description": "공공데이터포털에서 받은 인증키",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "pageNo",
+          "description": "페이지번호",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "numOfRows",
+          "description": "한 페이지 결과 수",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "resultType",
+          "description": "결과형식",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "stnd_yr",
+          "description": "경기연도",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "week_tcnt",
+          "description": "등록회차수",
+          "type": "number",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "day_tcnt",
+          "description": "경기회차수",
+          "type": "number",
+          "required": true,
+          "in": "query"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "API_CRA_CYCLE_EXER_I-item": {
+      "type": "object",
+      "properties": {
+        "starting_nope": {
+          "type": "number",
+          "description": "선발급인원수"
+        },
+        "eclnt_nope": {
+          "type": "number",
+          "description": "우수급인원수"
+        },
+        "get_eclet_nope": {
+          "type": "number",
+          "description": "특선급인원수"
+        },
+        "stnd_yr": {
+          "type": "string",
+          "description": "경기연도"
+        },
+        "week_tcnt": {
+          "type": "number",
+          "description": "주횟수"
+        },
+        "day_tcnt": {
+          "type": "number",
+          "description": "일횟수"
+        },
+        "race_ymd": {
+          "type": "string",
+          "description": "경주일자"
+        },
+        "tak_nope": {
+          "type": "number",
+          "description": "트랙연습인원수"
+        },
+        "rora_nope": {
+          "type": "number",
+          "description": "로라연습인원수"
+        },
+        "repr_nope": {
+          "type": "number",
+          "description": "정비점검인원수"
+        },
+        "row_num": {
+          "type": "string",
+          "description": "순번"
+        }
+      }
+    },
+    "API_CRA_CYCLE_EXER_I-header": {
+      "type": "object",
+      "properties": {
+        "resultMsg": {
+          "type": "string",
+          "description": "결과메시지"
+        },
+        "resultCode": {
+          "type": "string",
+          "description": "결과코드"
+        }
+      }
+    },
+    "API_CRA_CYCLE_EXER_I-items": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/API_CRA_CYCLE_EXER_I-item"
+        }
+      }
+    },
+    "API_CRA_CYCLE_EXER_I-body": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "$ref": "#/definitions/API_CRA_CYCLE_EXER_I-items"
+        },
+        "pageNo": {
+          "type": "string",
+          "description": "페이지번호"
+        },
+        "totalCount": {
+          "type": "string",
+          "description": "전체 결과 수"
+        },
+        "numOfRows": {
+          "type": "string",
+          "description": "한 페이지 결과 수"
+        }
+      }
+    },
+    "API_CRA_CYCLE_PART_I-header": {
+      "type": "object",
+      "properties": {
+        "resultMsg": {
+          "type": "string",
+          "description": "결과메시지"
+        },
+        "resultCode": {
+          "type": "string",
+          "description": "결과코드"
+        }
+      }
+    },
+    "API_CRA_CYCLE_PART_I-body": {
+      "type": "object",
+      "properties": {
+        "pageNo": {
+          "type": "string",
+          "description": "페이지번호"
+        },
+        "totalCount": {
+          "type": "string",
+          "description": "전체 결과 수"
+        },
+        "numOfRows": {
+          "type": "string",
+          "description": "한 페이지 결과 수"
+        },
+        "items": {
+          "$ref": "#/definitions/API_CRA_CYCLE_PART_I-items"
+        }
+      }
+    },
+    "API_CRA_CYCLE_PART_I-items": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/API_CRA_CYCLE_PART_I-item"
+        }
+      }
+    },
+    "API_CRA_CYCLE_PART_I-item": {
+      "type": "object",
+      "properties": {
+        "mstr_unit_nm": {
+          "type": "string",
+          "description": "대분류부품명"
+        },
+        "salv_unit_nm": {
+          "type": "string",
+          "description": "소분류부품명"
+        },
+        "row_num": {
+          "type": "string",
+          "description": "순번"
+        }
+      }
+    },
+    "API_CRA_INSPECT_I-item": {
+      "type": "object",
+      "properties": {
+        "bf_strt2_tcnt": {
+          "type": "number",
+          "description": "출주전2일차점검횟수"
+        },
+        "bf_strt3_tcnt": {
+          "type": "number",
+          "description": "출주전3일차점검횟수"
+        },
+        "bf_strt4_tcnt": {
+          "type": "number",
+          "description": "출주전4일차점검횟수"
+        },
+        "bf_strt5_tcnt": {
+          "type": "number",
+          "description": "출주전5일차점검횟수"
+        },
+        "now_str1_tcnt": {
+          "type": "number",
+          "description": "출주직전점검1일차횟수"
+        },
+        "now_str2_tcnt": {
+          "type": "number",
+          "description": "출주직전점검2일차횟수"
+        },
+        "now_str3_tcnt": {
+          "type": "number",
+          "description": "출주직전점검3일차횟수"
+        },
+        "now_str4_tcnt": {
+          "type": "number",
+          "description": "출주직전점검4일차횟수"
+        },
+        "now_str5_tcnt": {
+          "type": "number",
+          "description": "출주직전점검5일차횟수"
+        },
+        "af_str1_tcnt": {
+          "type": "number",
+          "description": "1일차출주후점검횟수"
+        },
+        "af_str2_tcnt": {
+          "type": "number",
+          "description": "2일차출주후점검횟수"
+        },
+        "af_str3_tcnt": {
+          "type": "number",
+          "description": "3일차출주후점검횟수"
+        },
+        "af_str4_tcnt": {
+          "type": "number",
+          "description": "4일차출주후점검횟수"
+        },
+        "af_str5_tcnt": {
+          "type": "number",
+          "description": "5일차출주후점검횟수"
+        },
+        "max_race_ymd": {
+          "type": "string",
+          "description": "현황점검일자"
+        },
+        "cfm_insp_cnt": {
+          "type": "number",
+          "description": "입소일검차수"
+        },
+        "bf_strt1_tcnt": {
+          "type": "number",
+          "description": "출주전1일차점검횟수"
+        },
+        "stnd_yr": {
+          "type": "string",
+          "description": "경기연도"
+        },
+        "week_tcnt": {
+          "type": "number",
+          "description": "주횟수"
+        },
+        "dmag_cd": {
+          "type": "string",
+          "description": "파손구분코드"
+        },
+        "row_num": {
+          "type": "string",
+          "description": "순번"
+        }
+      }
+    },
+    "API_CRA_INSPECT_I-header": {
+      "type": "object",
+      "properties": {
+        "resultCode": {
+          "type": "string",
+          "description": "결과코드"
+        },
+        "resultMsg": {
+          "type": "string",
+          "description": "결과메시지"
+        }
+      }
+    },
+    "API_CRA_INSPECT_I-body": {
+      "type": "object",
+      "properties": {
+        "pageNo": {
+          "type": "string",
+          "description": "페이지번호"
+        },
+        "totalCount": {
+          "type": "string",
+          "description": "전체 결과 수"
+        },
+        "numOfRows": {
+          "type": "string",
+          "description": "한 페이지 결과 수"
+        },
+        "items": {
+          "$ref": "#/definitions/API_CRA_INSPECT_I-items"
+        }
+      }
+    },
+    "API_CRA_INSPECT_I-items": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/API_CRA_INSPECT_I-item"
+        }
+      }
+    },
+    "API_CRA_INOUT_I-item": {
+      "type": "object",
+      "properties": {
+        "day_tcnt": {
+          "type": "number",
+          "description": "일횟수"
+        },
+        "cycle_keep_cnt": {
+          "type": "number",
+          "description": "보관대수"
+        },
+        "cycle_out_cnt": {
+          "type": "number",
+          "description": "출고대수"
+        },
+        "week_tcnt": {
+          "type": "number",
+          "description": "주횟수"
+        },
+        "stnd_yr": {
+          "type": "string",
+          "description": "경기연도"
+        },
+        "row_num": {
+          "type": "string",
+          "description": "순번"
+        }
+      }
+    },
+    "API_CRA_INOUT_I-header": {
+      "type": "object",
+      "properties": {
+        "resultCode": {
+          "type": "string",
+          "description": "결과코드"
+        },
+        "resultMsg": {
+          "type": "string",
+          "description": "결과메시지"
+        }
+      }
+    },
+    "API_CRA_INOUT_I-body": {
+      "type": "object",
+      "properties": {
+        "pageNo": {
+          "type": "string",
+          "description": "페이지번호"
+        },
+        "totalCount": {
+          "type": "string",
+          "description": "전체 결과 수"
+        },
+        "numOfRows": {
+          "type": "string",
+          "description": "한 페이지 결과 수"
+        },
+        "items": {
+          "$ref": "#/definitions/API_CRA_INOUT_I-items"
+        }
+      }
+    },
+    "API_CRA_INOUT_I-items": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/API_CRA_INOUT_I-item"
+        }
+      }
+    }
+  },
+  "swaggerOprtinVOs": [
+    {
+      "oprtinUrl": "https://openapi.kspo.or.kr/web/service/SRVC_OD_API_CRA_CYCLE_EXER/TODZ_API_CRA_INOUT_I",
+      "oprtinNm": "자전거 보관현황 목록 조회",
+      "oprtinDc": "년도, 회차, 일차 등의 검색조건을 지정하여 경륜운영 사업 관련 자전거 보관 현황 정보를 조회 기능",
+      "gwSvcNm": "TODZ_API_CRA_INOUT_I",
+      "operationId": "TODZ_API_CRA_INOUT_I",
+      "publicDataTyDetailCode": "PRDE02",
+      "reqList": [
+        {
+          "paramtrNm": "serviceKey",
+          "paramtrDc": "공공데이터포털에서 받은 인증키",
+          "paramtrBassValue": "-",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "pageNo",
+          "paramtrDc": "페이지번호",
+          "paramtrBassValue": "1",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "numOfRows",
+          "paramtrDc": "한 페이지 결과 수",
+          "paramtrBassValue": "10",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "resultType",
+          "paramtrDc": "결과형식",
+          "paramtrBassValue": "XML/JSON",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "stnd_yr",
+          "paramtrDc": "경기연도",
+          "paramtrBassValue": "2019",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "week_tcnt",
+          "paramtrDc": "등록회차수",
+          "paramtrBassValue": "1",
+          "paramtrTy": "number",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "day_tcnt",
+          "paramtrDc": "경기회차수",
+          "paramtrBassValue": "1",
+          "paramtrTy": "number",
+          "paramtrDivision": "필수",
+          "ck": true
+        }
+      ],
+      "resList": [
+        {
+          "paramtrNm": "header",
+          "paramtrDc": "header",
+          "paramtrDefNm": "#/definitions/API_CRA_INOUT_I-header",
+          "subDefNm": "API_CRA_INOUT_I-header",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "body",
+          "paramtrDc": "body",
+          "paramtrDefNm": "#/definitions/API_CRA_INOUT_I-body",
+          "subDefNm": "API_CRA_INOUT_I-body",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true
+        }
+      ]
+    }
+  ]
+}

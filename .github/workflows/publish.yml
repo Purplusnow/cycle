@@ -1,0 +1,156 @@
+# 개최일에 맞춰 자료를 받아 사이트를 다시 굽고 GitHub Pages 로 올린다.
+#
+# 광명 경륜은 **금·토·일**에 시행하고 발주는 11:20~21:20 KST 다
+# (실측: 2025년 이후 금 84일 · 토 84일 · 일 83일, 월요일이 4일).
+#
+# 그런데도 **매일** 돈다. 개최일만 돌리면 일요일 결과가 다음 주 금요일까지
+# 닷새 동안 반영되지 않는다. 경정 버전에서 같은 이유로 같은 결론에 도달했다.
+#
+#   08:30 KST — 개최일이면 발주 전 예상 게시 / 그 외에는 전날 결과 반영
+#   23:30 KST — 마지막 경주(21:20 발주)가 끝난 뒤 한 번 더 훑는다
+#
+# **크론은 UTC 다.** KST 는 +9 이므로 23:30 UTC = 08:30 KST(다음 날),
+# 14:30 UTC = 23:30 KST. GitHub 의 예약 실행은 몇 분에서 십수 분 늦을 수 있다.
+# 08:30 을 고른 것은 첫 발주(11:20)까지 여유를 두기 위해서다.
+name: 사이트 배포
+
+on:
+  schedule:
+    - cron: "30 23 * * *"     # 매일 08:30 KST
+    - cron: "30 14 * * *"     # 매일 23:30 KST
+  workflow_dispatch:           # 손으로도 돌릴 수 있게
+
+permissions:
+  # 확정 기록(records/frozen.json)을 저장소에 되돌려 쓰기 위해 write 가 필요하다.
+  contents: write
+  pages: write
+  id-token: write
+
+# 배포는 한 번에 하나만. 앞 실행이 끝나기 전에 다음이 끼어들면 반쯤 만든
+# 사이트가 올라갈 수 있다.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  PYTHONPATH: src
+  KCYCLE_SERVICE_KEY: ${{ secrets.KCYCLE_SERVICE_KEY }}
+  # 커스텀 도메인(cycle.koreanblog.xyz)은 루트에 놓이므로 기준 경로가 없다.
+  # 프로젝트 페이지로 임시 배포할 일이 생기면 여기를 /<저장소명> 으로 채우고
+  # config.yaml 의 site.url·base_path 도 함께 바꾼다.
+  CYCLEAI_BASE: ""
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      # 수집 자료(600MB 남짓, raw_json 정리 후 그보다 작다)는 저장소에 담지 않고
+      # 캐시로 나른다.
+      #
+      # **복원과 저장을 나눈 이유**: 통짜 actions/cache 는 잡이 실패하면 저장을
+      # 건너뛴다. 첫 실행에서 24년치를 오래 받아 놓고 뒤 단계가 깨지면 그 수집이
+      # 통째로 날아간다. 수집이 끝나자마자 저장해 두면 이후 어디서 깨지든 다음
+      # 실행이 그 지점부터 이어간다.
+      - name: 수집 자료 복원
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: cycleai-db-${{ github.run_id }}
+          restore-keys: cycleai-db-
+
+      # 캐시가 없으면(첫 실행·만료) 처음부터 만든다. 24년치 백필이 1,500회
+      # 남짓 호출이라 개발계정 일일 한도 안에 들어간다. 시간은 걸리지만 드물다.
+      #
+      # 포털이 잠시 죽어도 배포까지 죽이지 않는다. 통신 한 번 실패했다고
+      # 사이트를 아예 안 굽는 것보다, 기존 자료로 굽고 경고를 남기는 편이 낫다.
+      # 자료 결손은 뒤의 점검 단계가 세고, 다음 실행이 이어받는다.
+      #
+      # 다만 **DB 가 아예 없을 때의 최초 수집은 관대하게 넘기지 않는다.**
+      # 그때 실패하면 예상도 검증도 없는 빈 사이트가 올라간다.
+      - name: 자료 수집
+        run: |
+          # 해외 러너에서 포털 접속이 자주 끊긴다. 클라이언트가 이미 재시도를
+          # 하지만, 그래도 못 받으면 단계 수준에서 두 번 더 시도한다.
+          collect () {
+            for try in 1 2 3; do
+              python -m cycleai.kcycle.collect daily && return 0
+              echo "수집 $try 회차 실패 — 30초 뒤 다시 시도"
+              sleep 30
+            done
+            return 1
+          }
+          if [ -f data/cycleai.sqlite ]; then
+            collect \
+              || echo "::warning::자료 수집 실패 — 기존 자료로 진행합니다"
+          else
+            echo "캐시 없음 — 처음부터 수집합니다"
+            python -m cycleai.kcycle.collect backfill
+            python -m cycleai.predict backfill
+          fi
+          python -m cycleai.kcycle.collect prune || true
+
+      # 확정 기록을 DB 로 되돌린다. 캐시가 만료되면 DB 는 새로 만들어지는데,
+      # **발주 전에 확정 저장한 예상은 그때 사라지면 안 된다** — 적중률이
+      # 사후 조작이 아니라는 근거가 그것뿐이다. 저장소의 파일이 원본이다.
+      - name: 확정 기록 복원
+        run: python -m cycleai.predict import
+
+      # 비싼 단계가 끝났으니 곧바로 저장한다. 뒤에서 실패해도 남는다.
+      - name: 수집 자료 저장
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data
+          key: cycleai-db-${{ github.run_id }}
+
+      # 발주가 지나지 않은 경주에만 예상을 만든다. 이미 저장된 예상은 건드리지
+      # 않으므로 하루 두 번 돌려도 덮어쓰지 않는다.
+      - name: 예상 생성
+        run: |
+          python -m cycleai.predict upcoming \
+            || echo "::warning::예상 생성 실패 — 기존 예상으로 진행합니다"
+
+      # 자료 결손은 실패로 만들지 않는다 — 배당은 원래 늦게 들어오므로 저녁
+      # 실행에서도 일부는 비어 있다. 다만 로그에는 남겨 눈에 띄게 한다.
+      - name: 자료 점검
+        run: python -m cycleai.audit --days 30 || true
+
+      # 새로 확정한 예상을 저장소에 남긴다. 캐시는 임시지만 저장소는 남는다.
+      - name: 확정 기록 저장
+        run: |
+          python -m cycleai.predict export
+          if git diff --quiet records/; then
+            echo "새로 확정된 예상 없음"
+          else
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add records/
+            git commit -m "확정 기록 갱신 ($(TZ=Asia/Seoul date +%Y-%m-%d\ %H:%M) KST)"
+            git push
+          fi
+
+      - name: 사이트 빌드
+        run: python -m cycleai.site
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

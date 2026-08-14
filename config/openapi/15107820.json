@@ -1,0 +1,276 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "경륜 - 회차별 경주득점정보는 연도, 회차, 일차, 시행처를 기준으로 각 경주에 출전한 선수들이 획득한 득점을 체계적으로 기록한 데이터입니다. 이 데이터에는 선수 고유 번호와 이름, 그리고 각 경주에서 획득한 점수가 포함되어 있으며, 이를 통해 특정 선수의 경기력 추이와 시즌별 성과를 정밀하게 분석할 수 있습니다. 또한 특정 시행처에서의 선수별 득점 현황을 확인할 수 있어 지역별 또는 경주장별 성과 차이를 비교하는 데에도 유용하게 활용됩니다. 이 정보는 경륜경정총괄본부에서 제공하며, 선수의 점수 누적 현황을 기반으로 한 순위 산정, 전반적인 성적 분석, 선수 간 경쟁력 비교 등 다양한 통계적 분석과 전략 수립에 핵심적인 역할을 합니다. 특히 회차별로 출전한 선수들의 득점 변동 사항을 면밀히 파악함으로써 향후 경주 결과를 예측하거나 선수의 성장 가능성을 평가하는 데에도 필수적인 기초 자료로 사용됩니다.\n\n",
+    "version": "1.0.0",
+    "title": "서울올림픽기념국민체육진흥공단_경주사업총괄본부 경륜-회차별 경주득점정보_GW"
+  },
+  "host": "apis.data.go.kr/B551014/SRVC_OD_API_CRA_TMS_SCR",
+  "basePath": "",
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/TODZ_API_CRA_TMS_SCR_I": {
+      "get": {
+        "responses": {
+          "0": {
+            "description": "NORMAL SERVICE / 정상 수행 입니다.."
+          },
+          "10": {
+            "description": "INVALID_REQUEST_PARAMETER_ERROR / 잘못된 요청 파라메터 에러"
+          },
+          "200": {
+            "description": "성공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "header": {
+                  "$ref": "#/definitions/API_CRA_TMS_SCR_I-header"
+                },
+                "body": {
+                  "$ref": "#/definitions/API_CRA_TMS_SCR_I-body"
+                }
+              },
+              "xml": {
+                "name": "response"
+              }
+            }
+          },
+          "301": {
+            "description": "INVALID REQUEST RESULT TYPE / 잘못된 결과형태 요청"
+          },
+          "334": {
+            "description": "START PAGE NUMBER GREATER THAN LAST PAGE NUMBER / 시작 페이지 숫자가 끝 페이지 숫자보다 큼"
+          },
+          "336": {
+            "description": "CANNOT REQUEST MORE THAN 1000 DATA AT A TIME / 한번에 1000건 이상의 요청은 할 수 없음"
+          },
+          "340": {
+            "description": "NO MANDATORY REQUEST PARAMETERS ERROR / 필수 요청 파라미터가 입력되지 않거나 부적절한 값이 입력되었음"
+          },
+          "500": {
+            "description": "INTERNAL_SERVER_ERROR / 내부 서버 오류"
+          },
+          "601": {
+            "description": "INVALID_OPEN_API_OPERATION_ERROR / 잘못된 오픈 API 작동 오류"
+          }
+        },
+        "tags": [
+          "API 목록"
+        ],
+        "summary": "경륜회차별 경주득점정보 조회",
+        "description": "년도, 회차 등의 조회조건을 이용해 서울올림픽기념국민체육진흥공단 기금조성총괄본부에서 진행하는 경륜경기의 경주득점정보를 조회하는 기능",
+        "operationId": "TODZ_API_CRA_TMS_SCR_I",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "serviceKey",
+          "description": "공공데이터포털에서 받은 인증키",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "pageNo",
+          "description": "페이지번호",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "numOfRows",
+          "description": "한 페이지 결과 수",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "resultType",
+          "description": "결과형식",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "stnd_yr",
+          "description": "경기연도",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "week_tcnt",
+          "description": "등록회차수",
+          "type": "number",
+          "required": true,
+          "in": "query"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "API_CRA_TMS_SCR_I-header": {
+      "type": "object",
+      "properties": {
+        "resultCode": {
+          "type": "string",
+          "description": "결과코드"
+        },
+        "resultMsg": {
+          "type": "string",
+          "description": "결과메시지"
+        }
+      }
+    },
+    "API_CRA_TMS_SCR_I-body": {
+      "type": "object",
+      "properties": {
+        "pageNo": {
+          "type": "string",
+          "description": "페이지번호"
+        },
+        "totalCount": {
+          "type": "string",
+          "description": "전체 결과 수"
+        },
+        "numOfRows": {
+          "type": "string",
+          "description": "한 페이지 결과 수"
+        },
+        "items": {
+          "$ref": "#/definitions/API_CRA_TMS_SCR_I-items"
+        }
+      }
+    },
+    "API_CRA_TMS_SCR_I-items": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/API_CRA_TMS_SCR_I-item"
+        }
+      }
+    },
+    "API_CRA_TMS_SCR_I-item": {
+      "type": "object",
+      "properties": {
+        "stnd_yr": {
+          "type": "string",
+          "description": "경기연도"
+        },
+        "meet_nm": {
+          "type": "string",
+          "description": "경륜장명"
+        },
+        "racer_nm": {
+          "type": "string",
+          "description": "선수명"
+        },
+        "race_scr": {
+          "type": "number",
+          "description": "경주득점수"
+        },
+        "day_tcnt": {
+          "type": "number",
+          "description": "경기회차수"
+        },
+        "week_tcnt": {
+          "type": "number",
+          "description": "등록회차수"
+        },
+        "row_num": {
+          "type": "string",
+          "description": "순번"
+        }
+      }
+    }
+  },
+  "swaggerOprtinVOs": [
+    {
+      "oprtinUrl": "https://openapi.kspo.or.kr/web/service/SRVC_OD_API_CRA_TMS_SCR/TODZ_API_CRA_TMS_SCR_I",
+      "oprtinNm": "경륜회차별 경주득점정보 조회",
+      "oprtinDc": "년도, 회차 등의 조회조건을 이용해 서울올림픽기념국민체육진흥공단 기금조성총괄본부에서 진행하는 경륜경기의 경주득점정보를 조회하는 기능",
+      "gwSvcNm": "TODZ_API_CRA_TMS_SCR_I",
+      "operationId": "TODZ_API_CRA_TMS_SCR_I",
+      "publicDataTyDetailCode": "PRDE02",
+      "reqList": [
+        {
+          "paramtrNm": "serviceKey",
+          "paramtrDc": "공공데이터포털에서 받은 인증키",
+          "paramtrBassValue": "-",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "pageNo",
+          "paramtrDc": "페이지번호",
+          "paramtrBassValue": "1",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "numOfRows",
+          "paramtrDc": "한 페이지 결과 수",
+          "paramtrBassValue": "10",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "resultType",
+          "paramtrDc": "결과형식",
+          "paramtrBassValue": "XML",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "stnd_yr",
+          "paramtrDc": "경기연도",
+          "paramtrBassValue": "2020",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "week_tcnt",
+          "paramtrDc": "등록회차수",
+          "paramtrBassValue": "01",
+          "paramtrTy": "number",
+          "paramtrDivision": "필수",
+          "ck": true
+        }
+      ],
+      "resList": [
+        {
+          "paramtrNm": "header",
+          "paramtrDc": "header",
+          "paramtrDefNm": "#/definitions/API_CRA_TMS_SCR_I-header",
+          "subDefNm": "API_CRA_TMS_SCR_I-header",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "body",
+          "paramtrDc": "body",
+          "paramtrDefNm": "#/definitions/API_CRA_TMS_SCR_I-body",
+          "subDefNm": "API_CRA_TMS_SCR_I-body",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true
+        }
+      ]
+    }
+  ]
+}

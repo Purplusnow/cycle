@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% if analytics.get('ga4_id') %}
+{# 구글 애널리틱스 (gtag.js).
+
+   **만드는 사람의 접속은 세지 않는다.** 개발 중에는 자기 방문이 전체의 대부분을
+   차지해 숫자가 통계가 아니라 자기 그림자가 된다. IP 필터는 주소가 바뀌면 새므로
+   브라우저에 표식을 남기는 쪽이 확실하다 — 기기마다 한 번씩 ?noga=1 로 들어오면
+   그 뒤로는 계속 빠지고, ?noga=0 으로 되돌린다.
+
+   표식이 있으면 스크립트를 아예 싣지 않아 네트워크 요청도 나가지 않는다. #}
+<script>
+  (function () {
+    try {
+      var q = new URLSearchParams(location.search).get('noga');
+      if (q === '1') localStorage.setItem('cycleai.noga', '1');
+      if (q === '0') localStorage.removeItem('cycleai.noga');
+      if (localStorage.getItem('cycleai.noga')) return;
+    } catch (e) { /* 저장소를 못 쓰면 그냥 집계한다 */ }
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id={{ analytics.ga4_id }}';
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { dataLayer.push(arguments); };
+    gtag('js', new Date());
+    gtag('config', '{{ analytics.ga4_id }}');
+  })();
+</script>
+{% endif %}
+<title>{% block title %}{{ site.name }}{% endblock %}</title>
+<meta name="description" content="{% block description %}{{ site.description }}{% endblock %}">
+{% if site.url %}<link rel="canonical" href="{{ site.url }}{{ base }}{{ page_url }}">{% endif %}
+{% if verification.get('google') %}<meta name="google-site-verification" content="{{ verification.google }}">{% endif %}
+{% if verification.get('naver') %}<meta name="naver-site-verification" content="{{ verification.naver }}">{% endif %}
+<link rel="stylesheet" href="{{ base }}/static/style.css?v={{ assets.get('style.css', '1') }}">
+{% if adsense.get('client') %}
+{# 애드센스 로더. client 가 비어 있으면 스크립트 자체가 나가지 않는다 —
+   설정이 없는데 외부 요청만 나가는 일이 없어야 한다. #}
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ adsense.client }}"
+        crossorigin="anonymous"></script>
+{% endif %}
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚴</text></svg>">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="{{ base }}/">
+      <span class="brand-mark">🚴</span>
+      <span class="brand-text">
+        <strong>{{ site.name }}</strong>
+        <small>{{ site.tagline }}</small>
+      </span>
+    </a>
+    <nav class="nav">
+      <a href="{{ base }}/"{% if page_url == '/' %} class="on"{% endif %}>예상</a>
+      <a href="{{ base }}/results/"{% if page_url == '/results/' %} class="on"{% endif %}>결과</a>
+      <a href="{{ base }}/accuracy/"{% if page_url == '/accuracy/' %} class="on"{% endif %}>적중률</a>
+      <a href="{{ base }}/strategy/"{% if page_url == '/strategy/' %} class="on"{% endif %}>베팅 전략</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+{% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="warn">
+      본 사이트의 예상은 <strong>공식 경주 기록</strong>을 통계 모델로 분석한
+      결과이며 적중을 보장하지 않습니다. 검증 결과
+      <strong>지속적인 수익을 기대할 수 있는 방식은 확인되지 않았습니다</strong> —
+      일부 승식의 누적 회수율이 100%를 넘지만 그 값은 소수의 고배당 적중에
+      매달려 있으며, 고배당을 제외하면 모두 100% 아래입니다. 투표권 구매를
+      권유하지 않으며, 투표 결과에 대한 책임은 이용자 본인에게 있습니다.
+      <strong>19세 미만 구매 불가.</strong>
+    </p>
+    <p class="built">빌드 {{ built_at }} KST</p>
+  </div>
+</footer>
+
+<script>
+/* 발주가 지난 경주를 흐리게 표시한다.
+   **빌드 시각이 아니라 보는 사람의 시계**를 기준으로 한다 — 정적 사이트라
+   빌드 때 정해 두면 몇 시간만 지나도 틀린 표시가 된다. 자바스크립트가 막히면
+   아무 표시도 안 될 뿐, 내용은 그대로 읽힌다. */
+(function () {
+  var rows = document.querySelectorAll('[data-post]');
+  if (!rows.length) return;
+  var now = new Date();
+  Array.prototype.forEach.call(rows, function (el) {
+    var v = el.dataset.post;                       // YYYYMMDDHHMM
+    if (!v || v.length < 12) return;
+    var t = new Date(+v.slice(0, 4), +v.slice(4, 6) - 1, +v.slice(6, 8),
+                     +v.slice(8, 10), +v.slice(10, 12));
+    if (now > t) el.classList.add('is-past');
+  });
+})();
+</script>
+
+</body>
+</html>

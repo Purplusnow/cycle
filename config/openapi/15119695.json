@@ -1,0 +1,990 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "경륜-낙차사고 정보는 국민체육진흥공단이 광명스피돔에서 시행하는 경륜 경주 중 발생한 낙차 사고에 대한 기록을 제공하는 공공데이터입니다. 이 데이터에는 사고 발생 여부, 시행 연도, 경주번호, 사고 발생 시점(경주 중, 결승선 통과 후 등)과 같은 기본 정보뿐만 아니라, 사고에 연루된 선수의 이름과 선수번호, 사고 유형, 위반 여부 및 위반 선수 정보, 사고 이후 상황 등 사고의 전반적인 맥락을 담고 있습니다. 이를 통해 사고 발생 원인 분석, 선수 안전관리, 공정한 경주 운영 등을 위한 기초 자료로 활용할 수 있습니다. 낙차사고 데이터는 경륜의 안전성과 제도적 개선을 위한 중요한 정보로서, 경륜 팬, 연구자, 정책 담당자 모두에게 유용한 통찰을 제공합니다.",
+    "version": "1.0.0",
+    "title": "서울올림픽기념국민체육진흥공단_경주사업총괄본부 경륜_낙차사고 정보"
+  },
+  "host": "apis.data.go.kr/B551014/SRVC_TODZ_CRA_DOWN_ACDNT",
+  "basePath": "",
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/TODZ_CRA_DOWN_ACDNT": {
+      "get": {
+        "responses": {
+          "0": {
+            "description": "NORMAL SERVICE / 정상 수행 입니다."
+          },
+          "10": {
+            "description": "INVALID_REQUEST_PARAMETER_ERROR / 잘못된 요청 파라메터 에러"
+          },
+          "200": {
+            "description": "성공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "header": {
+                  "type": "object",
+                  "description": "header",
+                  "properties": {
+                    "resultCode": {
+                      "type": "string",
+                      "description": "결과코드",
+                      "properties": {}
+                    },
+                    "resultMsg": {
+                      "type": "string",
+                      "description": "결과메세지",
+                      "properties": {}
+                    }
+                  }
+                },
+                "body": {
+                  "type": "object",
+                  "description": "body",
+                  "properties": {
+                    "items": {
+                      "type": "object",
+                      "description": "items",
+                      "properties": {
+                        "item": {
+                          "type": "object",
+                          "description": "item",
+                          "properties": {
+                            "row_num": {
+                              "type": "string",
+                              "description": "순번",
+                              "properties": {}
+                            },
+                            "stnd_year": {
+                              "type": "string",
+                              "description": "시행연도",
+                              "properties": {}
+                            },
+                            "tms": {
+                              "type": "string",
+                              "description": "회차",
+                              "properties": {}
+                            },
+                            "day_ord": {
+                              "type": "string",
+                              "description": "일차",
+                              "properties": {}
+                            },
+                            "race_no": {
+                              "type": "string",
+                              "description": "경주번호",
+                              "properties": {}
+                            },
+                            "down_acdnt_cd": {
+                              "type": "string",
+                              "description": "구분(낙차/사고)",
+                              "properties": {}
+                            },
+                            "type_cd": {
+                              "type": "string",
+                              "description": "유형(경주중)",
+                              "properties": {}
+                            },
+                            "evac_walk_cd": {
+                              "type": "string",
+                              "description": "구분(후송/도보)",
+                              "properties": {}
+                            },
+                            "racer_no1": {
+                              "type": "string",
+                              "description": "선수번호1",
+                              "properties": {}
+                            },
+                            "leav1_cd": {
+                              "type": "string",
+                              "description": "선수번호1퇴장구분",
+                              "properties": {}
+                            },
+                            "down_indu1_yn": {
+                              "type": "string",
+                              "description": "선수번호1낙차유발여부",
+                              "properties": {}
+                            },
+                            "racer_no2": {
+                              "type": "string",
+                              "description": "선수번호2",
+                              "properties": {}
+                            },
+                            "leav2_cd": {
+                              "type": "string",
+                              "description": "선수번호2퇴장구분",
+                              "properties": {}
+                            },
+                            "down_indu2_yn": {
+                              "type": "string",
+                              "description": "선수번호2낙차유발여부",
+                              "properties": {}
+                            },
+                            "racer_no3": {
+                              "type": "string",
+                              "description": "선수번호3",
+                              "properties": {}
+                            },
+                            "leav3_cd": {
+                              "type": "string",
+                              "description": "선수번호3퇴장구분",
+                              "properties": {}
+                            },
+                            "down_indu3_yn": {
+                              "type": "string",
+                              "description": "선수번호3낙차유발여부",
+                              "properties": {}
+                            },
+                            "racer_no4": {
+                              "type": "string",
+                              "description": "선수번호4",
+                              "properties": {}
+                            },
+                            "leav4_cd": {
+                              "type": "string",
+                              "description": "선수번호4퇴장구분",
+                              "properties": {}
+                            },
+                            "down_indu4_yn": {
+                              "type": "string",
+                              "description": "선수번호4낙차유발여부",
+                              "properties": {}
+                            },
+                            "racer_no5": {
+                              "type": "string",
+                              "description": "선수번호5",
+                              "properties": {}
+                            },
+                            "leav5_cd": {
+                              "type": "string",
+                              "description": "선수번호5퇴장구분",
+                              "properties": {}
+                            },
+                            "down_indu5_yn": {
+                              "type": "string",
+                              "description": "선수번호5낙차유발여부",
+                              "properties": {}
+                            },
+                            "racer_no6": {
+                              "type": "string",
+                              "description": "선수번호6",
+                              "properties": {}
+                            },
+                            "leav6_cd": {
+                              "type": "string",
+                              "description": "선수번호6퇴장구분",
+                              "properties": {}
+                            },
+                            "down_indu6_yn": {
+                              "type": "string",
+                              "description": "선수번호6낙차유발여부",
+                              "properties": {}
+                            },
+                            "racer_no7": {
+                              "type": "string",
+                              "description": "선수번호7",
+                              "properties": {}
+                            },
+                            "leav7_cd": {
+                              "type": "string",
+                              "description": "선수번호7퇴장구분",
+                              "properties": {}
+                            },
+                            "down_indu7_yn": {
+                              "type": "string",
+                              "description": "선수번호7낙차유발여부",
+                              "properties": {}
+                            },
+                            "racer_no8": {
+                              "type": "string",
+                              "description": "선수번호8",
+                              "properties": {}
+                            },
+                            "leav8_cd": {
+                              "type": "string",
+                              "description": "선수번호8퇴장구분",
+                              "properties": {}
+                            },
+                            "down_indu8_yn": {
+                              "type": "string",
+                              "description": "선수번호8낙차유발여부",
+                              "properties": {}
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "totalCount": {
+                      "type": "string",
+                      "description": "전체 결과 수",
+                      "properties": {}
+                    },
+                    "numOfRows": {
+                      "type": "string",
+                      "description": "한 페이지 결과 수",
+                      "properties": {}
+                    },
+                    "pageNo": {
+                      "type": "string",
+                      "description": "페이지번호",
+                      "properties": {}
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "response"
+              }
+            }
+          },
+          "301": {
+            "description": "INVALID REQUEST RESULT TYPE / 잘못된 결과형태 요청"
+          },
+          "334": {
+            "description": "START PAGE NUMBER GREATER THAN LAST PAGE NUMBER / 시작 페이지 숫자가 끝 페이지 숫자보다 큼"
+          },
+          "336": {
+            "description": "CANNOT REQUEST MORE THAN 1000 DATA AT A TIME / 한번에 1000건 이상의 요청은 할 수 없음"
+          },
+          "340": {
+            "description": "NO MANDATORY REQUEST PARAMETERS ERROR / 필수 요청 파라미터가 입력되지 않거나 부적절한 값이 입력되었음"
+          },
+          "500": {
+            "description": "INTERNAL_SERVER_ERROR / 내부 서버 오류"
+          },
+          "601": {
+            "description": "INVALID_OPEN_API_OPERATION_ERROR / 잘못된 오픈 API 작동 오류"
+          }
+        },
+        "tags": [
+          "API 목록"
+        ],
+        "summary": "경륜 낙차사고 정보 조회",
+        "description": "시행연도, 경주회차, 일차 등 조회조건을 이용해 경륜 낙차사고 정보를 조회",
+        "operationId": "TODZ_CRA_DOWN_ACDNT",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "serviceKey",
+          "description": "공공데이터포털에서 받은 인증키",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "pageNo",
+          "description": "페이지번호",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "numOfRows",
+          "description": "한 페이지 결과 수",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "resultType",
+          "description": "결과형식",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "stnd_year",
+          "description": "시행연도",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "tms",
+          "description": "회차",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "day_ord",
+          "description": "일차",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "race_no",
+          "description": "경주번호",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "down_acdnt_cd",
+          "description": "구분(낙차/사고)",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "TODZ_CRA_DOWN_ACDNT_response": {
+      "type": "object",
+      "properties": {
+        "header": {
+          "type": "object",
+          "description": "header",
+          "properties": {
+            "resultCode": {
+              "type": "string",
+              "description": "결과코드"
+            },
+            "resultMsg": {
+              "type": "string",
+              "description": "결과메세지"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "description": "body",
+          "properties": {
+            "items": {
+              "type": "object",
+              "description": "items",
+              "properties": {
+                "item": {
+                  "type": "object",
+                  "description": "item",
+                  "properties": {
+                    "row_num": {
+                      "type": "string",
+                      "description": "순번"
+                    },
+                    "stnd_year": {
+                      "type": "string",
+                      "description": "시행연도"
+                    },
+                    "tms": {
+                      "type": "string",
+                      "description": "회차"
+                    },
+                    "day_ord": {
+                      "type": "string",
+                      "description": "일차"
+                    },
+                    "race_no": {
+                      "type": "string",
+                      "description": "경주번호"
+                    },
+                    "down_acdnt_cd": {
+                      "type": "string",
+                      "description": "구분(낙차/사고)"
+                    },
+                    "type_cd": {
+                      "type": "string",
+                      "description": "유형(경주중)"
+                    },
+                    "evac_walk_cd": {
+                      "type": "string",
+                      "description": "구분(후송/도보)"
+                    },
+                    "racer_no1": {
+                      "type": "string",
+                      "description": "선수번호1"
+                    },
+                    "leav1_cd": {
+                      "type": "string",
+                      "description": "선수번호1퇴장구분"
+                    },
+                    "down_indu1_yn": {
+                      "type": "string",
+                      "description": "선수번호1낙차유발여부"
+                    },
+                    "racer_no2": {
+                      "type": "string",
+                      "description": "선수번호2"
+                    },
+                    "leav2_cd": {
+                      "type": "string",
+                      "description": "선수번호2퇴장구분"
+                    },
+                    "down_indu2_yn": {
+                      "type": "string",
+                      "description": "선수번호2낙차유발여부"
+                    },
+                    "racer_no3": {
+                      "type": "string",
+                      "description": "선수번호3"
+                    },
+                    "leav3_cd": {
+                      "type": "string",
+                      "description": "선수번호3퇴장구분"
+                    },
+                    "down_indu3_yn": {
+                      "type": "string",
+                      "description": "선수번호3낙차유발여부"
+                    },
+                    "racer_no4": {
+                      "type": "string",
+                      "description": "선수번호4"
+                    },
+                    "leav4_cd": {
+                      "type": "string",
+                      "description": "선수번호4퇴장구분"
+                    },
+                    "down_indu4_yn": {
+                      "type": "string",
+                      "description": "선수번호4낙차유발여부"
+                    },
+                    "racer_no5": {
+                      "type": "string",
+                      "description": "선수번호5"
+                    },
+                    "leav5_cd": {
+                      "type": "string",
+                      "description": "선수번호5퇴장구분"
+                    },
+                    "down_indu5_yn": {
+                      "type": "string",
+                      "description": "선수번호5낙차유발여부"
+                    },
+                    "racer_no6": {
+                      "type": "string",
+                      "description": "선수번호6"
+                    },
+                    "leav6_cd": {
+                      "type": "string",
+                      "description": "선수번호6퇴장구분"
+                    },
+                    "down_indu6_yn": {
+                      "type": "string",
+                      "description": "선수번호6낙차유발여부"
+                    },
+                    "racer_no7": {
+                      "type": "string",
+                      "description": "선수번호7"
+                    },
+                    "leav7_cd": {
+                      "type": "string",
+                      "description": "선수번호7퇴장구분"
+                    },
+                    "down_indu7_yn": {
+                      "type": "string",
+                      "description": "선수번호7낙차유발여부"
+                    },
+                    "racer_no8": {
+                      "type": "string",
+                      "description": "선수번호8"
+                    },
+                    "leav8_cd": {
+                      "type": "string",
+                      "description": "선수번호8퇴장구분"
+                    },
+                    "down_indu8_yn": {
+                      "type": "string",
+                      "description": "선수번호8낙차유발여부"
+                    }
+                  }
+                }
+              }
+            },
+            "totalCount": {
+              "type": "string",
+              "description": "전체 결과 수"
+            },
+            "numOfRows": {
+              "type": "string",
+              "description": "한 페이지 결과 수"
+            },
+            "pageNo": {
+              "type": "string",
+              "description": "페이지번호"
+            }
+          }
+        }
+      }
+    }
+  },
+  "swaggerOprtinVOs": [
+    {
+      "oprtinUrl": "https://openapi.kspo.or.kr/web/service/SRVC_TODZ_CRA_DOWN_ACDNT/TODZ_CRA_DOWN_ACDNT",
+      "oprtinNm": "경륜 낙차사고 정보 조회",
+      "oprtinDc": "시행연도, 경주회차, 일차 등 조회조건을 이용해 경륜 낙차사고 정보를 조회",
+      "gwSvcNm": "TODZ_CRA_DOWN_ACDNT",
+      "operationId": "TODZ_CRA_DOWN_ACDNT",
+      "publicDataTyDetailCode": "PRDE02",
+      "reqList": [
+        {
+          "paramtrNm": "serviceKey",
+          "paramtrDc": "공공데이터포털에서 받은 인증키",
+          "paramtrBassValue": "-",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "pageNo",
+          "paramtrDc": "페이지번호",
+          "paramtrBassValue": "1",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "numOfRows",
+          "paramtrDc": "한 페이지 결과 수",
+          "paramtrBassValue": "10",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "resultType",
+          "paramtrDc": "결과형식",
+          "paramtrBassValue": "XML",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "stnd_year",
+          "paramtrDc": "시행연도",
+          "paramtrBassValue": "",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "tms",
+          "paramtrDc": "회차",
+          "paramtrBassValue": "",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "day_ord",
+          "paramtrDc": "일차",
+          "paramtrBassValue": "",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "race_no",
+          "paramtrDc": "경주번호",
+          "paramtrBassValue": "",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "down_acdnt_cd",
+          "paramtrDc": "구분(낙차/사고)",
+          "paramtrBassValue": "",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        }
+      ],
+      "resList": [
+        {
+          "paramtrNm": "header",
+          "paramtrDc": "header",
+          "arrayYn": "N",
+          "paramtrDefNm": "#/definitions/CRA_DOWN_ACDNT-header",
+          "subDefNm": "CRA_DOWN_ACDNT-header",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true,
+          "subParam": [
+            {
+              "paramtrNm": "resultCode",
+              "paramtrDc": "결과코드",
+              "arrayYn": "N",
+              "paramtrDefNm": "",
+              "paramtrTy": "string",
+              "paramtrDivision": "필수",
+              "ck": true
+            },
+            {
+              "paramtrNm": "resultMsg",
+              "paramtrDc": "결과메세지",
+              "arrayYn": "N",
+              "paramtrDefNm": "",
+              "paramtrTy": "string",
+              "paramtrDivision": "필수",
+              "ck": true
+            }
+          ]
+        },
+        {
+          "paramtrNm": "body",
+          "paramtrDc": "body",
+          "arrayYn": "N",
+          "paramtrDefNm": "#/definitions/CRA_DOWN_ACDNT-body",
+          "subDefNm": "CRA_DOWN_ACDNT-body",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true,
+          "subParam": [
+            {
+              "paramtrNm": "items",
+              "paramtrDc": "items",
+              "arrayYn": "N",
+              "paramtrDefNm": "#/definitions/CRA_DOWN_ACDNT-items",
+              "subDefNm": "CRA_DOWN_ACDNT-items",
+              "paramtrTy": "object",
+              "paramtrDivision": "필수",
+              "ck": true,
+              "subParam": [
+                {
+                  "paramtrNm": "item",
+                  "paramtrDc": "item",
+                  "arrayYn": "N",
+                  "paramtrDefNm": "#/definitions/CRA_DOWN_ACDNT-item",
+                  "subDefNm": "CRA_DOWN_ACDNT-item",
+                  "paramtrTy": "object",
+                  "paramtrDivision": "필수",
+                  "ck": true,
+                  "subParam": [
+                    {
+                      "paramtrNm": "row_num",
+                      "paramtrDc": "순번",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "stnd_year",
+                      "paramtrDc": "시행연도",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "tms",
+                      "paramtrDc": "회차",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "day_ord",
+                      "paramtrDc": "일차",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "race_no",
+                      "paramtrDc": "경주번호",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "down_acdnt_cd",
+                      "paramtrDc": "구분(낙차/사고)",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "type_cd",
+                      "paramtrDc": "유형(경주중)",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "evac_walk_cd",
+                      "paramtrDc": "구분(후송/도보)",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "racer_no1",
+                      "paramtrDc": "선수번호1",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "leav1_cd",
+                      "paramtrDc": "선수번호1퇴장구분",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "down_indu1_yn",
+                      "paramtrDc": "선수번호1낙차유발여부",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "racer_no2",
+                      "paramtrDc": "선수번호2",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "leav2_cd",
+                      "paramtrDc": "선수번호2퇴장구분",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "down_indu2_yn",
+                      "paramtrDc": "선수번호2낙차유발여부",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "racer_no3",
+                      "paramtrDc": "선수번호3",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "leav3_cd",
+                      "paramtrDc": "선수번호3퇴장구분",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "down_indu3_yn",
+                      "paramtrDc": "선수번호3낙차유발여부",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "racer_no4",
+                      "paramtrDc": "선수번호4",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "leav4_cd",
+                      "paramtrDc": "선수번호4퇴장구분",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "down_indu4_yn",
+                      "paramtrDc": "선수번호4낙차유발여부",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "racer_no5",
+                      "paramtrDc": "선수번호5",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "leav5_cd",
+                      "paramtrDc": "선수번호5퇴장구분",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "down_indu5_yn",
+                      "paramtrDc": "선수번호5낙차유발여부",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "racer_no6",
+                      "paramtrDc": "선수번호6",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "leav6_cd",
+                      "paramtrDc": "선수번호6퇴장구분",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "down_indu6_yn",
+                      "paramtrDc": "선수번호6낙차유발여부",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "racer_no7",
+                      "paramtrDc": "선수번호7",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "leav7_cd",
+                      "paramtrDc": "선수번호7퇴장구분",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "down_indu7_yn",
+                      "paramtrDc": "선수번호7낙차유발여부",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "racer_no8",
+                      "paramtrDc": "선수번호8",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "leav8_cd",
+                      "paramtrDc": "선수번호8퇴장구분",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "down_indu8_yn",
+                      "paramtrDc": "선수번호8낙차유발여부",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "paramtrNm": "totalCount",
+              "paramtrDc": "전체 결과 수",
+              "arrayYn": "N",
+              "paramtrDefNm": "",
+              "paramtrTy": "string",
+              "paramtrDivision": "필수",
+              "ck": true
+            },
+            {
+              "paramtrNm": "numOfRows",
+              "paramtrDc": "한 페이지 결과 수",
+              "arrayYn": "N",
+              "paramtrDefNm": "",
+              "paramtrTy": "string",
+              "paramtrDivision": "필수",
+              "ck": true
+            },
+            {
+              "paramtrNm": "pageNo",
+              "paramtrDc": "페이지번호",
+              "arrayYn": "N",
+              "paramtrDefNm": "",
+              "paramtrTy": "string",
+              "paramtrDivision": "필수",
+              "ck": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+{% from "_macros.html" import ad with context %}
+
+{% block title %}실전 베팅 전략 검토 · {{ site.name }}{% endblock %}
+{% block description %}마틴게일 등 베팅금 조절과 선택 규칙을 실제 경주 기록에 적용해 회수율을 다시 계산했습니다.{% endblock %}
+
+{% block content %}
+
+<h1>실전 베팅 전략</h1>
+
+{% if s.empty %}
+<section class="card empty"><p>판정 가능한 예측이 없습니다.</p></section>
+{% else %}
+
+<p class="lede">
+  베팅금 조절(마틴게일 등)과 선택 규칙을 {{ s.period[0] }} ~ {{ s.period[1] }} 의
+  <b>{{ '{:,}'.format(s.n_races) }}경주</b> 에 적용해 회수율을 재계산한 결과입니다.
+</p>
+
+{# 결론에 쓰는 숫자는 전부 계산 결과에서 꺼낸다. 손으로 적어 넣으면 자료가
+   하루만 늘어도 본문과 표가 다른 말을 하게 된다. #}
+{% set flat = (s.stages | selectattr('label', 'equalto', '매 경주 단승') | first) %}
+{% set worst = (s.payback | sort(attribute='payback') | first) %}
+{% set bestpb = (s.payback | sort(attribute='payback') | last) %}
+
+<section class="card callout">
+  <h2>결론</h2>
+  <p>
+    <b>베팅금 조절은 기대값을 바꾸지 못합니다.</b> 게다가
+    <b>1회 구매 한도가 {{ '{:,.0f}'.format(s.max_stake) }}원</b>이라, 손실을 덮는
+    회수 베팅 자체가 성립하지 않습니다 — 기본
+    {{ '{:,.0f}'.format(s.base_stake) }}원에서 두 배씩 올리면
+    {{ '{:,.0f}'.format(s.base_stake * 8) }}원이 한계이고 그다음은 구매할 수
+    없습니다. 즉 <b>4연패를 넘어서면 회수 수단이 사라지고</b> 그때까지의 손실은
+    그대로 확정됩니다.
+    {% if flat %}
+    {% set fr = (flat.runs | selectattr('name', 'equalto', '정액') | first) %}
+    {% set mr = (flat.runs | selectattr('name', 'equalto', '마틴게일(2배)') | first) %}
+    {% if fr and mr and mr.ruined %}
+    매 경주 단승 기준 정액은 {{ '{:,}'.format(fr.n_bets) }}번째,
+    마틴게일은 <b>{{ '{:,}'.format(mr.n_bets) }}번째</b> 베팅에서 자금이
+    소진됐습니다.
+    {% endif %}
+    {% endif %}
+  </p>
+  <p>
+    기대값을 바꾸는 것은 <b>금액이 아니라 선택</b>입니다. 승식과 경주를 선별하면
+    회수율이 {{ worst.payback | pct }} → {{ s.best_selection.roi | pct }} 까지
+    올라갑니다. 다만 <b>고배당 한 방에 기대지 않고 100% 를 넘는 규칙은 확인되지
+    않았습니다.</b> 누적 회수율만 보면 100%를 넘는 승식이 하나 있는데, 그 값이
+    무엇에 매달려 있는지는 아래 표에서 함께 봅니다.
+  </p>
+</section>
+
+<section class="card">
+  <h2>왜 베팅금은 기대값을 못 바꾸나</h2>
+  <p class="formula">E[손익] &nbsp;=&nbsp; Σ<sub>i</sub> &nbsp; 베팅금<sub>i</sub> × ( 배당<sub>i</sub> × 적중<sub>i</sub> − 1 )</p>
+  <p class="note">
+    베팅금은 각 항에 곱해지는 양수이므로, 개별 베팅의 기대값이 음수면 어떤
+    가중치를 주어도 합은 음수입니다. 마틴게일은 <b>작은 이익을 자주, 큰 손실을
+    드물게</b> 만들어 손실의 발생 빈도를 낮출 뿐 총합을 바꾸지 않습니다.
+  </p>
+  <p class="note">
+    또한 <b>발주 전 배당률이 공개되지 않아</b> 손실 회수에 필요한 베팅금을
+    사전에 산출할 수 없습니다. 아래 <b>손실회수형</b>은 과거 평균 배당을 안다고
+    가정한 값으로, 실제 조건보다 유리합니다. 모든 시뮬레이션은
+    <b>1회 구매 한도 {{ '{:,.0f}'.format(s.max_stake) }}원</b>을 적용했습니다.
+  </p>
+</section>
+
+<section class="card">
+  <h2>넘어야 하는 벽 — 승식별 환급률</h2>
+  <p class="note">
+    전 조합 매수 시 반드시 1통이 적중하므로, 그때의 회수율이 해당 승식의
+    환급률입니다. <b>7명 편성이라 조합 수가 경정(6정)보다 큽니다</b> —
+    삼복승이 20통에서 35통으로 늘어납니다.
+  </p>
+  <div class="scroll">
+  <table class="tbl">
+    <thead><tr><th>승식</th><th class="r">평균 적중배당</th><th class="r">전체 조합</th>
+               <th class="r">환급률</th></tr></thead>
+    <tbody>
+      {% for p in s.payback %}
+      <tr><td>{{ p.pool }}</td><td class="r">{{ p.avg_payout | num(2) }}배</td>
+          <td class="r">{{ p.combos }}통</td>
+          <td class="r minus">{{ p.payback | pct }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  <p class="note">
+    {{ bestpb.pool }}이 {{ bestpb.payback | pct }} 로 가장 후하고
+    {{ worst.pool }}이 {{ worst.payback | pct }} 로 가장 박합니다.
+    <b>승식을 고르는 것만으로
+    {{ ((bestpb.payback - worst.payback) * 100) | round(0) | int }}%p 가 갈립니다.</b>
+  </p>
+</section>
+
+<section class="card">
+  <h2>선택 규칙 — 기대값을 바꾸는 유일한 손잡이</h2>
+  <p class="note">
+    단일 기간에서 다수 규칙을 시험하면 우연에 의한 과적합이 발생합니다.
+    <b>{{ s.split_year }}년 이전 구간에서 규칙을 선정하고 이후 구간으로 검증</b>했으며,
+    검증 열이 실제 성적입니다. <b>정렬 기준은 '절단'</b>입니다 — 이유는 표 아래에
+    적었습니다.
+  </p>
+  <div class="scroll">
+  <table class="tbl">
+    <thead><tr><th>규칙</th><th class="r">베팅</th><th class="r">적중률</th>
+               <th class="r">전체</th><th class="r">절단</th>
+               <th class="r">탐색<br>(~{{ s.split_year - 1 }})</th>
+               <th class="r">검증<br>({{ s.split_year }}~)</th></tr></thead>
+    <tbody>
+      {% for r in s.selections %}
+      <tr>
+        <td>{{ r.name }}<small>{{ r.desc }}</small></td>
+        <td class="r">{{ '{:,}'.format(r.n) }}</td>
+        <td class="r">{{ r.hit_rate | pct }}</td>
+        <td class="r {{ 'plus' if r.roi and r.roi >= 1 else '' }}">{{ r.roi | pct }}</td>
+        <td class="r minus">{{ r.roi_trim | pct }}</td>
+        <td class="r">{{ r.roi_train | pct }}</td>
+        <td class="r {{ 'plus' if r.roi_test and r.roi_test >= 1 else 'minus' }}">{{ r.roi_test | pct }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+
+  {% set tail = (s.selections | sort(attribute='tail_gap') | last) %}
+  {% if tail and tail.tail_gap > 0.2 %}
+  <div class="warn-inline">
+    <b>여기가 이 표에서 가장 조심해야 할 자리입니다.</b>
+    <b>{{ tail.name }}</b> 의 누적 회수율은 <b>{{ tail.roi | pct }}</b> 로 표에서
+    유일하게 100%를 넘습니다. 그러나 회수액 상위 1%를 눌러 다시 계산하면
+    <b>{{ tail.roi_trim | pct }}</b> 입니다. 즉 그 100% 초과는
+    <b>수백 배짜리를 몇 번 맞힌 기록</b>이지 반복 가능한 우위가 아닙니다.
+    누적 회수율로 규칙을 고르면 언제나 꼬리가 가장 두꺼운 승식이 1위로
+    올라오기 때문에, <b>이 표는 절단 회수율로 정렬</b>했습니다.
+  </div>
+  {% endif %}
+
+  <p class="note">
+    절단 기준으로 가장 좋은 규칙은 <b>{{ s.best_selection.name }}</b>
+    ({{ s.best_selection.desc }}) 로 회수율 {{ s.best_selection.roi | pct }}
+    (절단 {{ s.best_selection.roi_trim | pct }}) 입니다.
+    <b>그래도 100% 아래입니다.</b> 베팅 수가
+    {{ '{:,}'.format(s.best_selection.n) }}회로 줄어든다는 점도 함께 봐야 합니다 —
+    그 기간 동안 이것만 걸었다는 뜻입니다.
+  </p>
+</section>
+
+{% for stage in s.stages %}
+<section class="card">
+  <h2>베팅금 규칙 — {{ stage.label }}</h2>
+  <p class="note">
+    {{ '{:,}'.format(stage.n_available) }}회 베팅 · 적중률 {{ stage.hit_rate | pct }} ·
+    정액 회수율 {{ stage.flat_roi | pct }} ·
+    시드 {{ '{:,.0f}'.format(s.start_bankroll) }}원 · 기본 베팅 {{ '{:,.0f}'.format(s.base_stake) }}원 ·
+    <b>1회 구매 한도 {{ '{:,.0f}'.format(s.max_stake) }}원</b> 적용. 자금이 최소
+    베팅액 아래로 떨어지면 거기서 종료합니다.
+  </p>
+
+  {% if stage.chart %}
+  {# 좌표계를 그림마다 따로 싣는다. 스크립트가 첫 그림의 값을 모든 그림에 쓰면
+     여백 상수가 바뀌는 순간 십자선이 엉뚱한 곳을 가리킨다. #}
+  <figure class="viz-root chart-fig" data-chart='{{ stage.chart.series | map(attribute="curve") | list | tojson }}'
+          data-names='{{ stage.chart.series | map(attribute="name") | list | tojson }}'
+          data-plot='{{ stage.chart.plot | tojson }}' data-maxx="{{ stage.chart.max_x }}">
+    <figcaption>자금 곡선 — 베팅을 거듭할수록 남은 돈</figcaption>
+    <div class="scroll">
+    <svg viewBox="0 0 {{ stage.chart.w }} {{ stage.chart.h }}" class="chart"
+         role="img" aria-label="베팅 규칙별 자금 곡선.">
+      {% for t in stage.chart.yticks %}
+      <line x1="{{ stage.chart.plot.l }}" x2="{{ stage.chart.plot.r }}"
+            y1="{{ t.y }}" y2="{{ t.y }}" class="grid"/>
+      <text x="{{ stage.chart.plot.l - 8 }}" y="{{ t.y + 4 }}" class="axis r-anchor">{{ t.label }}</text>
+      {% endfor %}
+      {# 시드 기준선 — 이 선 위가 이익, 아래가 손실 #}
+      <line x1="{{ stage.chart.plot.l }}" x2="{{ stage.chart.plot.r }}"
+            y1="{{ stage.chart.start_y }}" y2="{{ stage.chart.start_y }}" class="baseline"/>
+      <text x="{{ stage.chart.plot.r + 6 }}" y="{{ stage.chart.start_y + 4 }}" class="axis">시드</text>
+      {% for t in stage.chart.xticks %}
+      <text x="{{ t.x }}" y="{{ stage.chart.h - 10 }}" class="axis m-anchor">{{ t.label }}</text>
+      {% endfor %}
+      <text x="{{ stage.chart.plot.r }}" y="{{ stage.chart.h - 10 }}" class="axis unit m-anchor">베팅 횟수</text>
+
+      {% for ser in stage.chart.series %}
+      <polyline points="{{ ser.points }}" fill="none" stroke="{{ ser.color }}"
+                stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      <circle cx="{{ ser.end_x }}" cy="{{ ser.end_y }}" r="4" fill="{{ ser.color }}"
+              stroke="var(--surface-1)" stroke-width="2"/>
+      {# 직접 라벨 — 색만으로 계열을 구분하면 색각 이상에서 읽히지 않는다 #}
+      <text x="{{ ser.end_x + 9 }}" y="{{ ser.label_y }}" class="slabel">{{ ser.name }}</text>
+      {% endfor %}
+      <g class="hover-layer"></g>
+    </svg>
+    </div>
+    <div class="legend small">
+      {% for ser in stage.chart.series %}
+      <span><i class="swatch" style="background:{{ ser.color }}"></i>{{ ser.name }}
+        <span class="dim">{{ '{:,}'.format(ser.n_bets) }}회에 {{ '파산' if ser.ruined else '종료' }}</span></span>
+      {% endfor %}
+    </div>
+  </figure>
+  {% endif %}
+
+  <div class="scroll">
+  <table class="tbl">
+    <thead><tr><th>베팅금 규칙</th><th class="r">베팅 수</th><th class="r">최종 자금</th>
+               <th class="r">수익률</th><th class="r">최대 한 번 베팅</th>
+               <th class="r">최장 연패</th><th>결과</th></tr></thead>
+    <tbody>
+      {% for r in stage.runs %}
+      <tr>
+        <td>{{ r.name }}<small>{{ r.doc }}</small></td>
+        <td class="r">{{ '{:,}'.format(r.n_bets) }}</td>
+        <td class="r">{{ '{:,}'.format(r.final) }}원</td>
+        <td class="r {{ 'plus' if r.return_pct >= 1 else 'minus' }}">{{ r.return_pct | pct }}</td>
+        <td class="r">{{ '{:,}'.format(r.max_stake) }}원</td>
+        <td class="r">{{ r.max_losing_streak }}</td>
+        <td>{% if r.ruined %}<span class="miss">파산</span>{% else %}생존{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+
+  {% if stage.streaks %}
+  <p class="note">
+    최장 <b>{{ stage.streaks.longest }}연패</b>. 1회 한도 안에서 2배 증액은
+    <b>{{ stage.streaks.limit_streak }}연패까지만</b> 가능하며, 그 구간 누적 손실은
+    {{ '{:,}'.format(stage.streaks.loss_at_limit) }}원입니다.
+    {% if stage.streaks.over_limit_races %}
+    이 구간을 넘어선 연패가 <b>{{ '{:,}'.format(stage.streaks.over_limit_races) }}회</b>
+    발생했으며, 해당 구간에서는 회수 베팅이 불가능합니다.
+    {% else %}
+    표본 내에서 이 구간을 넘어선 연패는 없었습니다.
+    {% endif %}
+  </p>
+  {% endif %}
+</section>
+{% endfor %}
+
+<section class="card">
+  <h2>그래서 무엇을 해야 하나</h2>
+  <ul class="prose">
+    <li><b>회수율을 올리는 방향은 선택뿐이다.</b> 승식과 경주를 고르는 것으로
+      {{ worst.payback | pct }} → {{ s.best_selection.roi | pct }} 까지 왔습니다.
+      남은 {{ ((1 - s.best_selection.roi) * 100) | round(0) | int }}%p 가 벽입니다.</li>
+    <li><b>남은 몫을 넘으려면 배당이 필요하다.</b> 기대값은 확률 × 배당인데,
+      공개 API 는 발주 전 배당을 주지 않습니다. 즉 <b>지금 자료로는 기대값을
+      계산할 수 없고</b>, 계산할 수 없는 것은 고를 수도 없습니다.
+      배당을 얻을 수 있다면 확률이 배당보다 높은 경주만 고르는 가치 베팅이
+      성립할 여지가 생깁니다 — 이 저장소는 거기까지 하지 않습니다.</li>
+    <li><b>모델이 쓸모없다는 뜻은 아니다.</b> 같은 돈으로 무작위보다 덜 잃습니다.
+      다만 그것은 <b>덜 잃는 것</b>이지 버는 것이 아닙니다.</li>
+    <li><b>이 표는 시간순 교차검증으로 산출한 과거 재현 기록입니다.</b>
+      발주 전 확정 저장한 공개 기록이 쌓이면 그쪽 숫자로 다시 계산해야 합니다.</li>
+  </ul>
+</section>
+
+<script>
+/* 자금 곡선 위에 십자선과 값 상자. 좌표는 빌드 타임에 확정돼 있고, 여기서는
+   가장 가까운 x 를 찾아 표시만 한다 — 스크립트가 막혀도 그림은 그대로 보인다. */
+(function () {
+  document.querySelectorAll('.chart-fig').forEach(function (fig) {
+    var svg = fig.querySelector('svg'), layer = fig.querySelector('.hover-layer');
+    if (!svg || !layer) return;
+    var curves = JSON.parse(fig.dataset.chart || '[]');
+    var names = JSON.parse(fig.dataset.names || '[]');
+    var plot = JSON.parse(fig.dataset.plot || '{}');
+    var maxX = parseFloat(fig.dataset.maxx || '0');
+    var polys = svg.querySelectorAll('polyline');
+    var vb = svg.viewBox.baseVal;
+    if (!maxX || plot.l === undefined) return;
+
+    function px(evt) {
+      var r = svg.getBoundingClientRect();
+      return (evt.clientX - r.left) / r.width * vb.width;
+    }
+    function hide() { layer.innerHTML = ''; }
+
+    svg.addEventListener('mouseleave', hide);
+    svg.addEventListener('mousemove', function (evt) {
+      var x = px(evt);
+      var l = plot.l, r = plot.r;
+      if (x < l || x > r) { hide(); return; }
+      var bet = Math.round((x - l) / (r - l) * maxX);
+      var parts = ['<line x1="' + x + '" x2="' + x + '" y1="' + plot.t +
+                   '" y2="' + plot.b + '" class="crosshair"/>'];
+      var lines = [];
+      curves.forEach(function (c, i) {
+        var last = null;
+        for (var k = 0; k < c.length; k++) { if (c[k][0] <= bet) last = c[k]; else break; }
+        var stroke = polys[i] ? polys[i].getAttribute('stroke') : '#888';
+        lines.push({ n: names[i], v: last ? last[1] : null, c: stroke });
+      });
+      var bw = 168, bh = 20 + lines.length * 16;
+      var bx = Math.min(x + 10, r - bw), by = 24;
+      parts.push('<rect x="' + bx + '" y="' + by + '" width="' + bw + '" height="' + bh +
+                 '" rx="6" class="tipbox"/>');
+      parts.push('<text x="' + (bx + 9) + '" y="' + (by + 15) + '" class="tiphead">' +
+                 bet.toLocaleString() + '번째 베팅</text>');
+      lines.forEach(function (o, i) {
+        var y = by + 32 + i * 16;
+        parts.push('<circle cx="' + (bx + 13) + '" cy="' + (y - 4) + '" r="3.5" fill="' + o.c + '"/>');
+        parts.push('<text x="' + (bx + 23) + '" y="' + y + '" class="tiptext">' + o.n + '</text>');
+        parts.push('<text x="' + (bx + bw - 9) + '" y="' + y + '" class="tipval r-anchor">' +
+                   (o.v === null ? '—' : o.v.toLocaleString() + '원') + '</text>');
+      });
+      layer.innerHTML = parts.join('');
+    });
+  });
+})();
+</script>
+
+{% endif %}
+{{ ad(adsense, 'slot_bottom') }}
+
+{% endblock %}

@@ -1,0 +1,826 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "경륜-경주결과 데이터는 국민체육진흥공단이 광명스피돔에서 시행하는 경륜 경주의 결과 정보를 체계적으로 제공하는 공공데이터입니다. 경주가 열린 날짜, 경륜장, 회차 및 경주번호 등 기본 정보와 함께, 각 경주별로 1~3위에 입상한 선수의 번호와 이름을 확인할 수 있습니다. 또한 단승, 복승, 쌍승, 삼복승, 연승, 쌍복승, 삼쌍승 등 다양한 승식에 따른 배당률과 그에 따른 매출액도 함께 포함되어 있어, 경주 결과에 대한 전반적인 데이터를 통합적으로 파악할 수 있습니다. 이 데이터는 경륜 팬과 연구자들이 경주 결과를 분석하거나 예측 모델에 활용할 수 있는 기반 자료로 활용되며, 경륜 산업의 투명성과 신뢰성을 높이는 데 기여합니다.",
+    "version": "1.0.0",
+    "title": "서울올림픽기념국민체육진흥공단_경주사업총괄본부 경륜-경주결과_GW"
+  },
+  "host": "apis.data.go.kr/B551014/SRVC_TODZ_CRA_RACE_RESULT",
+  "basePath": "",
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/TODZ_API_CRA_RACE_RESULT": {
+      "get": {
+        "responses": {
+          "0": {
+            "description": "NORMAL SERVICE / 정상 수행 입니다.."
+          },
+          "10": {
+            "description": "INVALID_REQUEST_PARAMETER_ERROR / 잘못된 요청 파라메터 에러"
+          },
+          "200": {
+            "description": "성공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "header": {
+                  "type": "object",
+                  "description": "header",
+                  "properties": {
+                    "resultCode": {
+                      "type": "string",
+                      "description": "결과코드",
+                      "properties": {}
+                    },
+                    "resultMsg": {
+                      "type": "string",
+                      "description": "결과메시지",
+                      "properties": {}
+                    }
+                  }
+                },
+                "body": {
+                  "type": "object",
+                  "description": "body",
+                  "properties": {
+                    "pageNo": {
+                      "type": "string",
+                      "description": "페이지번호",
+                      "properties": {}
+                    },
+                    "totalCount": {
+                      "type": "string",
+                      "description": "전체 결과 수",
+                      "properties": {}
+                    },
+                    "numOfRows": {
+                      "type": "string",
+                      "description": "한 페이지 결과 수",
+                      "properties": {}
+                    },
+                    "items": {
+                      "type": "object",
+                      "description": "items",
+                      "properties": {
+                        "item": {
+                          "type": "object",
+                          "description": "item",
+                          "properties": {
+                            "stnd_yr": {
+                              "type": "string",
+                              "description": "경기연도",
+                              "properties": {}
+                            },
+                            "race_ymd": {
+                              "type": "string",
+                              "description": "경주일자",
+                              "properties": {}
+                            },
+                            "meet_nm": {
+                              "type": "string",
+                              "description": "경륜장명",
+                              "properties": {}
+                            },
+                            "race_no": {
+                              "type": "string",
+                              "description": "경주번호",
+                              "properties": {}
+                            },
+                            "rank1": {
+                              "type": "string",
+                              "description": "1순위",
+                              "properties": {}
+                            },
+                            "rank2": {
+                              "type": "string",
+                              "description": "2순위",
+                              "properties": {}
+                            },
+                            "rank3": {
+                              "type": "string",
+                              "description": "3순위",
+                              "properties": {}
+                            },
+                            "pool1_val": {
+                              "type": "string",
+                              "description": "단승식값",
+                              "properties": {}
+                            },
+                            "pool2_val": {
+                              "type": "string",
+                              "description": "연승식값",
+                              "properties": {}
+                            },
+                            "pool4_val": {
+                              "type": "string",
+                              "description": "쌍승식값",
+                              "properties": {}
+                            },
+                            "pool5_val": {
+                              "type": "string",
+                              "description": "복승식값",
+                              "properties": {}
+                            },
+                            "pool6_val": {
+                              "type": "string",
+                              "description": "삼복승값",
+                              "properties": {}
+                            },
+                            "week_tcnt": {
+                              "type": "number",
+                              "description": "등록회차수",
+                              "properties": {}
+                            },
+                            "day_tcnt": {
+                              "type": "number",
+                              "description": "경기회차수",
+                              "properties": {}
+                            },
+                            "row_num": {
+                              "type": "string",
+                              "description": "순번",
+                              "properties": {}
+                            },
+                            "pool7_val": {
+                              "type": "string",
+                              "description": "쌍복승값",
+                              "properties": {}
+                            },
+                            "pool8_val": {
+                              "type": "string",
+                              "description": "삼쌍승값",
+                              "properties": {}
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "response"
+              }
+            }
+          },
+          "301": {
+            "description": "INVALID REQUEST RESULT TYPE / 잘못된 결과형태 요청"
+          },
+          "334": {
+            "description": "START PAGE NUMBER GREATER THAN LAST PAGE NUMBER / 시작 페이지 숫자가 끝 페이지 숫자보다 큼"
+          },
+          "336": {
+            "description": "CANNOT REQUEST MORE THAN 1000 DATA AT A TIME / 한번에 1000건 이상의 요청은 할 수 없음"
+          },
+          "340": {
+            "description": "NO MANDATORY REQUEST PARAMETERS ERROR / 필수 요청 파라미터가 입력되지 않거나 부적절한 값이 입력되었음"
+          },
+          "500": {
+            "description": "INTERNAL_SERVER_ERROR / 내부 서버 오류"
+          },
+          "601": {
+            "description": "INVALID_OPEN_API_OPERATION_ERROR / 잘못된 오픈 API 작동 오류"
+          }
+        },
+        "tags": [
+          "API 목록"
+        ],
+        "summary": "경륜경주결과 목록조회",
+        "description": "경륜경주결과 목록조회",
+        "operationId": "TODZ_API_CRA_RACE_RESULT",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "serviceKey",
+          "description": "공공데이터포털에서 받은 인증키",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "pageNo",
+          "description": "페이지번호",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "numOfRows",
+          "description": "한 페이지 결과 수",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "resultType",
+          "description": "결과형식",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "stnd_yr",
+          "description": "경기연도",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "meet_nm",
+          "description": "경륜장명",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "week_tcnt",
+          "description": "등록회차수",
+          "type": "number",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "day_tcnt",
+          "description": "경기회차수",
+          "type": "number",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "race_no",
+          "description": "경주번호",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "API_CRA_RACE_RESULT_I-header": {
+      "type": "object",
+      "properties": {
+        "resultCode": {
+          "type": "string",
+          "description": "결과코드"
+        },
+        "resultMsg": {
+          "type": "string",
+          "description": "결과메시지"
+        }
+      }
+    },
+    "API_CRA_RACE_RESULT_I-body": {
+      "type": "object",
+      "properties": {
+        "pageNo": {
+          "type": "string",
+          "description": "페이지번호"
+        },
+        "totalCount": {
+          "type": "string",
+          "description": "전체 결과 수"
+        },
+        "numOfRows": {
+          "type": "string",
+          "description": "한 페이지 결과 수"
+        },
+        "items": {
+          "$ref": "#/definitions/API_CRA_RACE_RESULT_I-items"
+        }
+      }
+    },
+    "API_CRA_RACE_RESULT_I-items": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/API_CRA_RACE_RESULT_I-item"
+        }
+      }
+    },
+    "API_CRA_RACE_RESULT_I-item": {
+      "type": "object",
+      "properties": {
+        "stnd_yr": {
+          "type": "string",
+          "description": "경기연도"
+        },
+        "race_ymd": {
+          "type": "string",
+          "description": "경주일자"
+        },
+        "meet_nm": {
+          "type": "string",
+          "description": "경륜장명"
+        },
+        "race_no": {
+          "type": "string",
+          "description": "경주번호"
+        },
+        "rank1": {
+          "type": "string",
+          "description": "1순위"
+        },
+        "rank2": {
+          "type": "string",
+          "description": "2순위"
+        },
+        "rank3": {
+          "type": "string",
+          "description": "3순위"
+        },
+        "pool1_val": {
+          "type": "string",
+          "description": "단승식값"
+        },
+        "pool2_val": {
+          "type": "string",
+          "description": "연승식값"
+        },
+        "pool4_val": {
+          "type": "string",
+          "description": "쌍승식값"
+        },
+        "pool5_val": {
+          "type": "string",
+          "description": "복승식값"
+        },
+        "pool6_val": {
+          "type": "string",
+          "description": "삼복승정보값"
+        },
+        "week_tcnt": {
+          "type": "number",
+          "description": "등록회차수"
+        },
+        "day_tcnt": {
+          "type": "number",
+          "description": "경기회차수"
+        },
+        "row_num": {
+          "type": "string",
+          "description": "순번"
+        }
+      }
+    },
+    "TODZ_API_CRA_RACE_RESULT_response": {
+      "type": "object",
+      "properties": {
+        "header": {
+          "type": "object",
+          "description": "header",
+          "properties": {
+            "resultCode": {
+              "type": "string",
+              "description": "결과코드"
+            },
+            "resultMsg": {
+              "type": "string",
+              "description": "결과메시지"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "description": "body",
+          "properties": {
+            "pageNo": {
+              "type": "string",
+              "description": "페이지번호"
+            },
+            "totalCount": {
+              "type": "string",
+              "description": "전체 결과 수"
+            },
+            "numOfRows": {
+              "type": "string",
+              "description": "한 페이지 결과 수"
+            },
+            "items": {
+              "type": "object",
+              "description": "items",
+              "properties": {
+                "item": {
+                  "type": "object",
+                  "description": "item",
+                  "properties": {
+                    "stnd_yr": {
+                      "type": "string",
+                      "description": "경기연도"
+                    },
+                    "race_ymd": {
+                      "type": "string",
+                      "description": "경주일자"
+                    },
+                    "meet_nm": {
+                      "type": "string",
+                      "description": "경륜장명"
+                    },
+                    "race_no": {
+                      "type": "string",
+                      "description": "경주번호"
+                    },
+                    "rank1": {
+                      "type": "string",
+                      "description": "1순위"
+                    },
+                    "rank2": {
+                      "type": "string",
+                      "description": "2순위"
+                    },
+                    "rank3": {
+                      "type": "string",
+                      "description": "3순위"
+                    },
+                    "pool1_val": {
+                      "type": "string",
+                      "description": "단승식값"
+                    },
+                    "pool2_val": {
+                      "type": "string",
+                      "description": "연승식값"
+                    },
+                    "pool4_val": {
+                      "type": "string",
+                      "description": "쌍승식값"
+                    },
+                    "pool5_val": {
+                      "type": "string",
+                      "description": "복승식값"
+                    },
+                    "pool6_val": {
+                      "type": "string",
+                      "description": "삼복승값"
+                    },
+                    "week_tcnt": {
+                      "type": "number",
+                      "description": "등록회차수"
+                    },
+                    "day_tcnt": {
+                      "type": "number",
+                      "description": "경기회차수"
+                    },
+                    "row_num": {
+                      "type": "string",
+                      "description": "순번"
+                    },
+                    "pool7_val": {
+                      "type": "string",
+                      "description": "쌍복승값"
+                    },
+                    "pool8_val": {
+                      "type": "string",
+                      "description": "삼쌍승값"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "swaggerOprtinVOs": [
+    {
+      "oprtinUrl": "https://openapi.kspo.or.kr/web/service/SRVC_TODZ_CRA_RACE_RESULT/TODZ_API_CRA_RACE_RESULT",
+      "oprtinNm": "경륜경주결과 목록조회",
+      "oprtinDc": "경륜경주결과 목록조회",
+      "gwSvcNm": "TODZ_API_CRA_RACE_RESULT",
+      "operationId": "TODZ_API_CRA_RACE_RESULT",
+      "publicDataTyDetailCode": "PRDE02",
+      "reqList": [
+        {
+          "paramtrNm": "serviceKey",
+          "paramtrDc": "공공데이터포털에서 받은 인증키",
+          "paramtrBassValue": "-",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "pageNo",
+          "paramtrDc": "페이지번호",
+          "paramtrBassValue": "1",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "numOfRows",
+          "paramtrDc": "한 페이지 결과 수",
+          "paramtrBassValue": "10",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "resultType",
+          "paramtrDc": "결과형식",
+          "paramtrBassValue": "XML",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "stnd_yr",
+          "paramtrDc": "경기연도",
+          "paramtrBassValue": "2015",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "meet_nm",
+          "paramtrDc": "경륜장명",
+          "paramtrBassValue": "광명",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "week_tcnt",
+          "paramtrDc": "등록회차수",
+          "paramtrBassValue": "45",
+          "paramtrTy": "number",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "day_tcnt",
+          "paramtrDc": "경기회차수",
+          "paramtrBassValue": "3",
+          "paramtrTy": "number",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "race_no",
+          "paramtrDc": "경주번호",
+          "paramtrBassValue": "14",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        }
+      ],
+      "resList": [
+        {
+          "paramtrNm": "header",
+          "paramtrDc": "header",
+          "arrayYn": "N",
+          "paramtrDefNm": "#/definitions/API_CRA_RACE_RESULT_I-header",
+          "subDefNm": "API_CRA_RACE_RESULT_I-header",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true,
+          "subParam": [
+            {
+              "paramtrNm": "resultCode",
+              "paramtrDc": "결과코드",
+              "arrayYn": "N",
+              "paramtrDefNm": "",
+              "paramtrTy": "string",
+              "paramtrDivision": "필수",
+              "ck": true
+            },
+            {
+              "paramtrNm": "resultMsg",
+              "paramtrDc": "결과메시지",
+              "arrayYn": "N",
+              "paramtrDefNm": "",
+              "paramtrTy": "string",
+              "paramtrDivision": "필수",
+              "ck": true
+            }
+          ]
+        },
+        {
+          "paramtrNm": "body",
+          "paramtrDc": "body",
+          "arrayYn": "N",
+          "paramtrDefNm": "#/definitions/API_CRA_RACE_RESULT_I-body",
+          "subDefNm": "API_CRA_RACE_RESULT_I-body",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true,
+          "subParam": [
+            {
+              "paramtrNm": "pageNo",
+              "paramtrDc": "페이지번호",
+              "arrayYn": "N",
+              "paramtrDefNm": "",
+              "paramtrTy": "string",
+              "paramtrDivision": "필수",
+              "ck": true
+            },
+            {
+              "paramtrNm": "totalCount",
+              "paramtrDc": "전체 결과 수",
+              "arrayYn": "N",
+              "paramtrDefNm": "",
+              "paramtrTy": "string",
+              "paramtrDivision": "필수",
+              "ck": true
+            },
+            {
+              "paramtrNm": "numOfRows",
+              "paramtrDc": "한 페이지 결과 수",
+              "arrayYn": "N",
+              "paramtrDefNm": "",
+              "paramtrTy": "string",
+              "paramtrDivision": "필수",
+              "ck": true
+            },
+            {
+              "paramtrNm": "items",
+              "paramtrDc": "items",
+              "arrayYn": "N",
+              "paramtrDefNm": "#/definitions/API_CRA_RACE_RESULT_I-items",
+              "subDefNm": "API_CRA_RACE_RESULT_I-items",
+              "paramtrTy": "object",
+              "paramtrDivision": "필수",
+              "ck": true,
+              "subParam": [
+                {
+                  "paramtrNm": "item",
+                  "paramtrDc": "item",
+                  "arrayYn": "N",
+                  "paramtrDefNm": "#/definitions/API_CRA_RACE_RESULT_I-item",
+                  "subDefNm": "API_CRA_RACE_RESULT_I-item",
+                  "paramtrTy": "object",
+                  "paramtrDivision": "필수",
+                  "ck": true,
+                  "subParam": [
+                    {
+                      "paramtrNm": "stnd_yr",
+                      "paramtrDc": "경기연도",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "race_ymd",
+                      "paramtrDc": "경주일자",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "meet_nm",
+                      "paramtrDc": "경륜장명",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "race_no",
+                      "paramtrDc": "경주번호",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "rank1",
+                      "paramtrDc": "1순위",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "rank2",
+                      "paramtrDc": "2순위",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "rank3",
+                      "paramtrDc": "3순위",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "pool1_val",
+                      "paramtrDc": "단승식값",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "pool2_val",
+                      "paramtrDc": "연승식값",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "pool4_val",
+                      "paramtrDc": "쌍승식값",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "pool5_val",
+                      "paramtrDc": "복승식값",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "pool6_val",
+                      "paramtrDc": "삼복승값",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "week_tcnt",
+                      "paramtrDc": "등록회차수",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "number",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "day_tcnt",
+                      "paramtrDc": "경기회차수",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "number",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "row_num",
+                      "paramtrDc": "순번",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "pool7_val",
+                      "paramtrDc": "쌍복승값",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "pool8_val",
+                      "paramtrDc": "삼쌍승값",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

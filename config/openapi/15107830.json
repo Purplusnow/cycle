@@ -1,0 +1,451 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "\"서울올림픽기념 국민체육진흥공단에서 제공하는 경륜 출주표 정보에 대한 Open API는 경주에 출전하는 선수들의 최근 3회전 성적, 시행처(경주장), 경주일자 등 주요 정보를 조회할 수 있는 공공데이터 서비스입니다. 이 API는 경기 분석 및 예측, 팬 서비스 확대, 언론·미디어 보도자료, 데이터 기반 스포츠 콘텐츠 제작 등에 활용되며, 각 선수의 출전 이력과 성적 흐름을 기반으로 경주의 흐름을 예측하는 데 도움을 줍니다. 사용자는 조건에 맞춰 경주별 출주표를 체계적으로 조회할 수 있어, 경륜 정보를 보다 손쉽고 정확하게 접근할 수 있습니다. 본 API는 경륜 팬과 산업 관계자 모두에게 실용적인 데이터 접근을 제공합니다.",
+    "version": "1.0.0",
+    "title": "서울올림픽기념국민체육진흥공단_경주사업총괄본부 경륜-출주표_GW"
+  },
+  "host": "apis.data.go.kr/B551014/SRVC_OD_API_CRA_RACE_ORGAN",
+  "basePath": "",
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/TODZ_API_CRA_RACE_ORGAN_I": {
+      "get": {
+        "responses": {
+          "0": {
+            "description": "NORMAL SERVICE / 정상 수행 입니다.."
+          },
+          "10": {
+            "description": "INVALID_REQUEST_PARAMETER_ERROR / 잘못된 요청 파라메터 에러"
+          },
+          "200": {
+            "description": "성공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "header": {
+                  "$ref": "#/definitions/API_CRA_RACE_ORGAN_I-header"
+                },
+                "body": {
+                  "$ref": "#/definitions/API_CRA_RACE_ORGAN_I-body"
+                }
+              },
+              "xml": {
+                "name": "response"
+              }
+            }
+          },
+          "301": {
+            "description": "INVALID REQUEST RESULT TYPE / 잘못된 결과형태 요청"
+          },
+          "334": {
+            "description": "START PAGE NUMBER GREATER THAN LAST PAGE NUMBER / 시작 페이지 숫자가 끝 페이지 숫자보다 큼"
+          },
+          "336": {
+            "description": "CANNOT REQUEST MORE THAN 1000 DATA AT A TIME / 한번에 1000건 이상의 요청은 할 수 없음"
+          },
+          "340": {
+            "description": "NO MANDATORY REQUEST PARAMETERS ERROR / 필수 요청 파라미터가 입력되지 않거나 부적절한 값이 입력되었음"
+          },
+          "500": {
+            "description": "INTERNAL_SERVER_ERROR / 내부 서버 오류"
+          },
+          "601": {
+            "description": "INVALID_OPEN_API_OPERATION_ERROR / 잘못된 오픈 API 작동 오류"
+          }
+        },
+        "tags": [
+          "API 목록"
+        ],
+        "summary": "경륜 출주표 목록조회",
+        "description": "경륜 출주표 목록조회",
+        "operationId": "TODZ_API_CRA_RACE_ORGAN_I",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "serviceKey",
+          "description": "공공데이터포털에서 받은 인증키",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "pageNo",
+          "description": "페이지번호",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "numOfRows",
+          "description": "한 페이지 결과 수",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "resultType",
+          "description": "결과형식",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "meet_nm",
+          "description": "경륜장명",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "stnd_yr",
+          "description": "경기연도",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "week_tcnt",
+          "description": "등록회차수",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "API_CRA_RACE_ORGAN_I-item": {
+      "type": "object",
+      "properties": {
+        "run_day_tcnt": {
+          "type": "string",
+          "description": "출전횟수"
+        },
+        "pre_win_cnt": {
+          "type": "string",
+          "description": "입상전법선행수"
+        },
+        "pas_win_cnt": {
+          "type": "string",
+          "description": "입상전법젖히기수"
+        },
+        "brk_win_cnt": {
+          "type": "string",
+          "description": "입상전법추입수"
+        },
+        "mrk_win_cnt": {
+          "type": "string",
+          "description": "입상전법마크수"
+        },
+        "racer_grd_cur_cd": {
+          "type": "string",
+          "description": "등급조정현재코드"
+        },
+        "racer_grd_bef_cd": {
+          "type": "string",
+          "description": "등급조정이전코드"
+        },
+        "area_tms3_avg_scr": {
+          "type": "string",
+          "description": "평균득점광명점수"
+        },
+        "tot_tms_avg_scr": {
+          "type": "string",
+          "description": "평균득점종합점수"
+        },
+        "bf1_meet_nm_nm": {
+          "type": "string",
+          "description": "최근1회전성적장소명"
+        },
+        "bf1_day1_ymd": {
+          "type": "string",
+          "description": "최근1회전성적경주일자"
+        },
+        "bf1_day1_rank": {
+          "type": "string",
+          "description": "최근1회전성적1일차순위"
+        },
+        "bf1_day2_rank": {
+          "type": "string",
+          "description": "최근1회전성적2일차순위"
+        },
+        "bf1_day3_rank": {
+          "type": "string",
+          "description": "최근1회전성적3일차순위"
+        },
+        "bf2_meet_nm": {
+          "type": "string",
+          "description": "최근2회전성적장소명"
+        },
+        "meet_nm": {
+          "type": "string",
+          "description": "경륜장명"
+        },
+        "stnd_yr": {
+          "type": "string",
+          "description": "경기연도"
+        },
+        "race_ymd": {
+          "type": "string",
+          "description": "경주일자"
+        },
+        "race_no": {
+          "type": "string",
+          "description": "경주번호"
+        },
+        "back_no": {
+          "type": "string",
+          "description": "등번호"
+        },
+        "color_nm": {
+          "type": "string",
+          "description": "색상명"
+        },
+        "racer_nm": {
+          "type": "string",
+          "description": "선수명"
+        },
+        "period_no": {
+          "type": "string",
+          "description": "기수번호"
+        },
+        "racer_age": {
+          "type": "string",
+          "description": "선수연령"
+        },
+        "gear_rate": {
+          "type": "string",
+          "description": "기어배수비율"
+        },
+        "rec_200m_scr": {
+          "type": "string",
+          "description": "200M기록점수"
+        },
+        "trng_plc_nm": {
+          "type": "string",
+          "description": "훈련지명"
+        },
+        "win_rate": {
+          "type": "string",
+          "description": "승률"
+        },
+        "high_rate": {
+          "type": "string",
+          "description": "연대율"
+        },
+        "high_3_rate": {
+          "type": "string",
+          "description": "삼연대율"
+        },
+        "racer_grd_cd": {
+          "type": "string",
+          "description": "등급코드"
+        },
+        "dptre_tm": {
+          "type": "string",
+          "description": "출발시각"
+        },
+        "round_cnt": {
+          "type": "string",
+          "description": "주회수"
+        },
+        "race_len": {
+          "type": "string",
+          "description": "경주길이"
+        },
+        "win_tot_tcnt": {
+          "type": "string",
+          "description": "입상횟수"
+        },
+        "bf2_day1_ymd": {
+          "type": "string",
+          "description": "최근2회전성적경주일자"
+        },
+        "bf2_day1_rank": {
+          "type": "string",
+          "description": "최근2회전성적1일차순위"
+        },
+        "bf2_day2_rank": {
+          "type": "string",
+          "description": "최근2회전성적2일차순위"
+        },
+        "bf2_day3_rank": {
+          "type": "string",
+          "description": "최근2회전성적3일차순위"
+        },
+        "bf3_meet_nm": {
+          "type": "string",
+          "description": "최근3회전성적장소명"
+        },
+        "bf3_day1_ymd": {
+          "type": "string",
+          "description": "최근3회전성적경주일자"
+        },
+        "bf3_day1_rank": {
+          "type": "string",
+          "description": "최근3회전성적1일차순위"
+        },
+        "bf3_day2_rank": {
+          "type": "string",
+          "description": "최근3회전성적2일차순위"
+        },
+        "bf3_day3_rank": {
+          "type": "string",
+          "description": "최근3회전성적3일차순위"
+        },
+        "week_tcnt": {
+          "type": "string",
+          "description": "등록회차수"
+        },
+        "day_tcnt": {
+          "type": "string",
+          "description": "경기회차수"
+        },
+        "row_num": {
+          "type": "string",
+          "description": "순번"
+        }
+      }
+    },
+    "API_CRA_RACE_ORGAN_I-header": {
+      "type": "object",
+      "properties": {
+        "resultCode": {
+          "type": "string",
+          "description": "결과코드"
+        },
+        "resultMsg": {
+          "type": "string",
+          "description": "결과메시지"
+        }
+      }
+    },
+    "API_CRA_RACE_ORGAN_I-body": {
+      "type": "object",
+      "properties": {
+        "pageNo": {
+          "type": "string",
+          "description": "페이지번호"
+        },
+        "totalCount": {
+          "type": "string",
+          "description": "전체 결과 수"
+        },
+        "numOfRows": {
+          "type": "string",
+          "description": "한 페이지 결과 수"
+        },
+        "items": {
+          "$ref": "#/definitions/API_CRA_RACE_ORGAN_I-items"
+        }
+      }
+    },
+    "API_CRA_RACE_ORGAN_I-items": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/API_CRA_RACE_ORGAN_I-item"
+        }
+      }
+    }
+  },
+  "swaggerOprtinVOs": [
+    {
+      "oprtinUrl": "https://openapi.kspo.or.kr/web/service/SRVC_OD_API_CRA_RACE_ORGAN/TODZ_API_CRA_RACE_ORGAN_I",
+      "oprtinNm": "경륜 출주표 목록조회",
+      "oprtinDc": "경륜 출주표 목록조회",
+      "gwSvcNm": "TODZ_API_CRA_RACE_ORGAN_I",
+      "operationId": "TODZ_API_CRA_RACE_ORGAN_I",
+      "publicDataTyDetailCode": "PRDE02",
+      "reqList": [
+        {
+          "paramtrNm": "serviceKey",
+          "paramtrDc": "공공데이터포털에서 받은 인증키",
+          "paramtrBassValue": "-",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "pageNo",
+          "paramtrDc": "페이지번호",
+          "paramtrBassValue": "1",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "numOfRows",
+          "paramtrDc": "한 페이지 결과 수",
+          "paramtrBassValue": "10",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "resultType",
+          "paramtrDc": "결과형식",
+          "paramtrBassValue": "XML",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "meet_nm",
+          "paramtrDc": "경륜장명",
+          "paramtrBassValue": "광명",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "stnd_yr",
+          "paramtrDc": "경기연도",
+          "paramtrBassValue": "2015",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "week_tcnt",
+          "paramtrDc": "등록회차수",
+          "paramtrBassValue": "45",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        }
+      ],
+      "resList": [
+        {
+          "paramtrNm": "header",
+          "paramtrDc": "header",
+          "paramtrDefNm": "#/definitions/API_CRA_RACE_ORGAN_I-header",
+          "subDefNm": "API_CRA_RACE_ORGAN_I-header",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "body",
+          "paramtrDc": "body",
+          "paramtrDefNm": "#/definitions/API_CRA_RACE_ORGAN_I-body",
+          "subDefNm": "API_CRA_RACE_ORGAN_I-body",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true
+        }
+      ]
+    }
+  ]
+}

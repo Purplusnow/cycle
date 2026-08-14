@@ -1,0 +1,38 @@
+{
+  "paths": {
+    "race_card": "SRVC_OD_API_CRA_RACE_ORGAN/TODZ_API_CRA_RACE_ORGAN_I",
+    "race_rank": "SRVC_CRA_RACE_RANK/TODZ_CRA_RACE_RANK",
+    "payoff": "SRVC_OD_API_CRA_PAYOFF/TODZ_API_CRA_PAYOFF_I",
+    "race_result": "SRVC_TODZ_CRA_RACE_RESULT/TODZ_API_CRA_RACE_RESULT",
+    "tms_score": "SRVC_OD_API_CRA_TMS_SCR/TODZ_API_CRA_TMS_SCR_I",
+    "down_accident": "SRVC_TODZ_CRA_DOWN_ACDNT/TODZ_CRA_DOWN_ACDNT",
+    "sanction": "SRVC_CRA_RACE_SANC/TODZ_CRA_RACE_SANC",
+    "oppo_win": "SRVC_OD_API_CRA_OPPO_WIN/todz_api_cra_oppo_win_i",
+    "racer_info": "SRVC_CRA_RACER_INFO/TODZ_CRA_RACER_INFO",
+    "bkno_sum": "SRVC_OD_API_CRA_RACER_BKNO_SUM/todz_api_racer_bkno_sum_i",
+    "race_video": "SRVC_WEB_CRA_MBR_INFO/TODZ_API_CYCLE_RACE_VIDEO",
+    "start_photo": "SRVC_WEB_CRA_MBR_INFO/TODZ_API_WEB_STRT_PHOTO",
+    "news": "SRVC_WEB_CRA_MBR_INFO/todz_api_web_cycle_news",
+    "exercise": "SRVC_OD_API_CRA_CYCLE_EXER/TODZ_API_CRA_CYCLE_EXER_I",
+    "inspect": "SRVC_OD_API_CRA_CYCLE_EXER/TODZ_API_CRA_INSPECT_I",
+    "inout": "SRVC_OD_API_CRA_CYCLE_EXER/TODZ_API_CRA_INOUT_I",
+    "cycle_part": "SRVC_OD_API_CRA_CYCLE_EXER/TODZ_API_CRA_CYCLE_PART_I"
+  },
+  "meta": {
+    "probed_at": "2026-08-14T11:06:11",
+    "context": {
+      "stnd_yr": "2026",
+      "week_tcnt": 1,
+      "day_tcnt": 1,
+      "race_no": 1,
+      "meet_nm": "광명",
+      "race_ymd": "2026.01.02",
+      "racer_nm": "신용수",
+      "racer_no": "20100013"
+    },
+    "zero_pad": {
+      "0채움 '01'": 1,
+      "맨숫자 '1'": 0
+    }
+  }
+}

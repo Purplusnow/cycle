@@ -1,0 +1,288 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "경륜-선수 배번집계정보는 서울올림픽기념국민체육진흥공단 경륜경정총괄본부에서 제공하는 공공데이터로, 경륜경기에 출전한 선수의 연도별 배번 분포를 확인할 수 있는 API 서비스입니다. 선수명을 기준으로 조회하면 해당 선수가 1번부터 7번까지 어떤 번호를 몇 번 배정받았는지를 수치로 제공합니다. 이 정보는 특정 번호에 편중된 배정 여부를 파악해 공정한 배번 운영이 이뤄지고 있는지를 확인하는 데 중요한 역할을 합니다. 또한 배번은 경기 전술이나 출발 위치에 영향을 주기 때문에, 분석을 통해 경기 흐름 예측이나 전략 수립에도 활용할 수 있습니다. 팬과 분석가, 관계자들에게 모두 유용한 참고자료로 평가됩니다.",
+    "version": "1.0.0",
+    "title": "서울올림픽기념국민체육진흥공단_경주사업총괄본부 경륜-선수 배번집계정보_GW"
+  },
+  "host": "apis.data.go.kr/B551014/SRVC_OD_API_CRA_RACER_BKNO_SUM",
+  "basePath": "",
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/todz_api_racer_bkno_sum_i": {
+      "get": {
+        "responses": {
+          "0": {
+            "description": "NORMAL SERVICE / 정상 수행 입니다.."
+          },
+          "10": {
+            "description": "INVALID_REQUEST_PARAMETER_ERROR / 잘못된 요청 파라메터 에러"
+          },
+          "200": {
+            "description": "성공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "header": {
+                  "$ref": "#/definitions/api_racer_bkno_sum_i-header"
+                },
+                "body": {
+                  "$ref": "#/definitions/api_racer_bkno_sum_i-body"
+                }
+              },
+              "xml": {
+                "name": "response"
+              }
+            }
+          },
+          "301": {
+            "description": "INVALID REQUEST RESULT TYPE / 잘못된 결과형태 요청"
+          },
+          "334": {
+            "description": "START PAGE NUMBER GREATER THAN LAST PAGE NUMBER / 시작 페이지 숫자가 끝 페이지 숫자보다 큼"
+          },
+          "336": {
+            "description": "CANNOT REQUEST MORE THAN 1000 DATA AT A TIME / 한번에 1000건 이상의 요청은 할 수 없음"
+          },
+          "340": {
+            "description": "NO MANDATORY REQUEST PARAMETERS ERROR / 필수 요청 파라미터가 입력되지 않거나 부적절한 값이 입력되었음"
+          },
+          "500": {
+            "description": "INTERNAL_SERVER_ERROR / 내부 서버 오류"
+          },
+          "601": {
+            "description": "INVALID_OPEN_API_OPERATION_ERROR / 잘못된 오픈 API 작동 오류"
+          }
+        },
+        "tags": [
+          "API 목록"
+        ],
+        "summary": "경륜선수별 배번집계정보 조회",
+        "description": "년도, 선수명 등을 이용해 서울올림픽기념국민체육진흥공단 기금조성총괄본부에서 진행하는 경륜경주에서 선수들이 배정받은 배번의 집계정보를 조회하는 기능",
+        "operationId": "todz_api_racer_bkno_sum_i",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "serviceKey",
+          "description": "공공데이터포털에서 받은 인증키",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "pageNo",
+          "description": "페이지번호",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "numOfRows",
+          "description": "한 페이지 결과 수",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "resultType",
+          "description": "결과형식",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "stnd_yr",
+          "description": "경기연도",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "racer_nm",
+          "description": "선수명",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "api_racer_bkno_sum_i-header": {
+      "type": "object",
+      "properties": {
+        "resultMsg": {
+          "type": "string",
+          "description": "결과메시지"
+        },
+        "resultCode": {
+          "type": "string",
+          "description": "결과코드"
+        }
+      }
+    },
+    "api_racer_bkno_sum_i-body": {
+      "type": "object",
+      "properties": {
+        "pageNo": {
+          "type": "string",
+          "description": "페이지번호"
+        },
+        "totalCount": {
+          "type": "string",
+          "description": "전체 결과 수"
+        },
+        "numOfRows": {
+          "type": "string",
+          "description": "한 페이지 결과 수"
+        },
+        "items": {
+          "$ref": "#/definitions/api_racer_bkno_sum_i-items"
+        }
+      }
+    },
+    "api_racer_bkno_sum_i-items": {
+      "type": "object",
+      "properties": {
+        "item": {
+          "$ref": "#/definitions/api_racer_bkno_sum_i-item"
+        }
+      }
+    },
+    "api_racer_bkno_sum_i-item": {
+      "type": "object",
+      "properties": {
+        "stnd_yr": {
+          "type": "string",
+          "description": "경기연도"
+        },
+        "racer_nm": {
+          "type": "string",
+          "description": "선수명"
+        },
+        "back_no_1_tcnt": {
+          "type": "number",
+          "description": "1번횟수"
+        },
+        "back_no_2_tcnt": {
+          "type": "number",
+          "description": "2번횟수"
+        },
+        "back_no_3_tcnt": {
+          "type": "number",
+          "description": "3번횟수"
+        },
+        "back_no_4_tcnt": {
+          "type": "number",
+          "description": "4번횟수"
+        },
+        "back_no_5_tcnt": {
+          "type": "number",
+          "description": "5번횟수"
+        },
+        "back_no_6_tcnt": {
+          "type": "number",
+          "description": "6번횟수"
+        },
+        "back_no_7_tcnt": {
+          "type": "number",
+          "description": "7번횟수"
+        },
+        "row_num": {
+          "type": "string",
+          "description": "순번"
+        }
+      }
+    }
+  },
+  "swaggerOprtinVOs": [
+    {
+      "oprtinUrl": "https://openapi.kspo.or.kr/web/service/SRVC_OD_API_CRA_RACER_BKNO_SUM/todz_api_racer_bkno_sum_i",
+      "oprtinNm": "경륜선수별 배번집계정보 조회",
+      "oprtinDc": "년도, 선수명 등을 이용해 서울올림픽기념국민체육진흥공단 기금조성총괄본부에서 진행하는 경륜경주에서 선수들이 배정받은 배번의 집계정보를 조회하는 기능",
+      "gwSvcNm": "todz_api_racer_bkno_sum_i",
+      "operationId": "todz_api_racer_bkno_sum_i",
+      "publicDataTyDetailCode": "PRDE02",
+      "reqList": [
+        {
+          "paramtrNm": "serviceKey",
+          "paramtrDc": "공공데이터포털에서 받은 인증키",
+          "paramtrBassValue": "-",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "pageNo",
+          "paramtrDc": "페이지번호",
+          "paramtrBassValue": "1",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "numOfRows",
+          "paramtrDc": "한 페이지 결과 수",
+          "paramtrBassValue": "10",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "resultType",
+          "paramtrDc": "결과형식",
+          "paramtrBassValue": "XML",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "stnd_yr",
+          "paramtrDc": "경기연도",
+          "paramtrBassValue": "2020",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "racer_nm",
+          "paramtrDc": "선수명",
+          "paramtrBassValue": "허은회",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        }
+      ],
+      "resList": [
+        {
+          "paramtrNm": "header",
+          "paramtrDc": "header",
+          "paramtrDefNm": "#/definitions/api_racer_bkno_sum_i-header",
+          "subDefNm": "api_racer_bkno_sum_i-header",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "body",
+          "paramtrDc": "body",
+          "paramtrDefNm": "#/definitions/api_racer_bkno_sum_i-body",
+          "subDefNm": "api_racer_bkno_sum_i-body",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true
+        }
+      ]
+    }
+  ]
+}

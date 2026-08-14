@@ -1,0 +1,780 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "경륜-선수정보는 국민체육진흥공단이 운영하는 경륜 경주의 선수 개별 정보를 종합적으로 제공하는 공공데이터 API 서비스입니다. 이 데이터는 선수번호, 이름, 등급과 같은 기본적인 신상정보는 물론, 출전회수, 출전일수, 각 순위별 입상 횟수(1위, 2위, 3위 등), 승률, 연대율, 삼연대율 등 상세한 성적 통계를 포함하고 있습니다. 또한 실격 및 포기 횟수, 전법별 1착 횟수, 기수, 평가점, 기어배수 등 경주 전략과 관련된 지표도 제공됩니다. 더불어 흡연량, 혈액형, 결혼 여부, 시력 같은 생체 정보까지 포함되어 있어 선수들의 전반적인 특성을 다각도로 분석할 수 있도록 설계되어 있습니다. 이 데이터는 성적 분석, 전략 수립, 예측 모델 구축 등 다양한 분야에서 활용도가 높으며, 경륜 팬들과 연구자, 데이터 분석가 모두에게 중요한 인사이트를 제공합니다.",
+    "version": "1.0.0",
+    "title": "서울올림픽기념국민체육진흥공단_경주사업총괄본부 경륜-선수정보"
+  },
+  "host": "apis.data.go.kr/B551014/SRVC_CRA_RACER_INFO",
+  "basePath": "",
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/TODZ_CRA_RACER_INFO": {
+      "get": {
+        "responses": {
+          "0": {
+            "description": "NORMAL SERVICE / 정상 수행 입니다.."
+          },
+          "10": {
+            "description": "INVALID_REQUEST_PARAMETER_ERROR / 잘못된 요청 파라메터 에러"
+          },
+          "200": {
+            "description": "성공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "header": {
+                  "type": "object",
+                  "description": "header",
+                  "properties": {
+                    "resultCode": {
+                      "type": "string",
+                      "description": "결과코드",
+                      "properties": {}
+                    },
+                    "resultMsg": {
+                      "type": "string",
+                      "description": "결과메시지",
+                      "properties": {}
+                    }
+                  }
+                },
+                "body": {
+                  "type": "object",
+                  "description": "body",
+                  "properties": {
+                    "pageNo": {
+                      "type": "string",
+                      "description": "페이지번호",
+                      "properties": {}
+                    },
+                    "totalCount": {
+                      "type": "string",
+                      "description": "전체 결과 수",
+                      "properties": {}
+                    },
+                    "numOfRows": {
+                      "type": "string",
+                      "description": "한 페이지 결과 수",
+                      "properties": {}
+                    },
+                    "items": {
+                      "type": "object",
+                      "description": "items",
+                      "properties": {
+                        "item": {
+                          "type": "object",
+                          "description": "item",
+                          "properties": {
+                            "racer_nm": {
+                              "type": "string",
+                              "description": "선수명",
+                              "properties": {}
+                            },
+                            "racer_grd_cd": {
+                              "type": "string",
+                              "description": "등급코드",
+                              "properties": {}
+                            },
+                            "run_cnt": {
+                              "type": "string",
+                              "description": "출주회차수",
+                              "properties": {}
+                            },
+                            "run_day_tcnt": {
+                              "type": "string",
+                              "description": "출전횟수",
+                              "properties": {}
+                            },
+                            "rank1_tcnt": {
+                              "type": "string",
+                              "description": "1위횟수",
+                              "properties": {}
+                            },
+                            "win_rate": {
+                              "type": "string",
+                              "description": "승률",
+                              "properties": {}
+                            },
+                            "rank2_tcnt": {
+                              "type": "string",
+                              "description": "2위횟수",
+                              "properties": {}
+                            },
+                            "high_rate": {
+                              "type": "string",
+                              "description": "연대율",
+                              "properties": {}
+                            },
+                            "rank3_tcnt": {
+                              "type": "string",
+                              "description": "3위횟수",
+                              "properties": {}
+                            },
+                            "high_3_rate": {
+                              "type": "string",
+                              "description": "삼연대율",
+                              "properties": {}
+                            },
+                            "rank4_tcnt": {
+                              "type": "string",
+                              "description": "4위횟수",
+                              "properties": {}
+                            },
+                            "stnd_yr": {
+                              "type": "string",
+                              "description": "경기연도",
+                              "properties": {}
+                            },
+                            "rank5_tcnt": {
+                              "type": "string",
+                              "description": "5위횟수",
+                              "properties": {}
+                            },
+                            "rank6_tcnt": {
+                              "type": "string",
+                              "description": "6위횟수",
+                              "properties": {}
+                            },
+                            "rank7_tcnt": {
+                              "type": "string",
+                              "description": "7위횟수",
+                              "properties": {}
+                            },
+                            "rank8_tcnt": {
+                              "type": "string",
+                              "description": "8위횟수",
+                              "properties": {}
+                            },
+                            "rank9_tcnt": {
+                              "type": "string",
+                              "description": "9위횟수",
+                              "properties": {}
+                            },
+                            "elim_tcnt": {
+                              "type": "string",
+                              "description": "실격횟수",
+                              "properties": {}
+                            },
+                            "down_po_cnt": {
+                              "type": "string",
+                              "description": "낙차포기수",
+                              "properties": {}
+                            },
+                            "go_po_tcnt": {
+                              "type": "string",
+                              "description": "고장포기횟수",
+                              "properties": {}
+                            },
+                            "period_no": {
+                              "type": "string",
+                              "description": "기수번호",
+                              "properties": {}
+                            },
+                            "row_num": {
+                              "type": "string",
+                              "description": "순번",
+                              "properties": {}
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "response"
+              }
+            }
+          },
+          "301": {
+            "description": "INVALID REQUEST RESULT TYPE / 잘못된 결과형태 요청"
+          },
+          "334": {
+            "description": "START PAGE NUMBER GREATER THAN LAST PAGE NUMBER / 시작 페이지 숫자가 끝 페이지 숫자보다 큼"
+          },
+          "336": {
+            "description": "CANNOT REQUEST MORE THAN 1000 DATA AT A TIME / 한번에 1000건 이상의 요청은 할 수 없음"
+          },
+          "340": {
+            "description": "NO MANDATORY REQUEST PARAMETERS ERROR / 필수 요청 파라미터가 입력되지 않거나 부적절한 값이 입력되었음"
+          },
+          "500": {
+            "description": "INTERNAL_SERVER_ERROR / 내부 서버 오류"
+          },
+          "601": {
+            "description": "INVALID_OPEN_API_OPERATION_ERROR / 잘못된 오픈 API 작동 오류"
+          }
+        },
+        "tags": [
+          "API 목록"
+        ],
+        "summary": "경륜 선수정보 목록조회",
+        "description": "경륜 선수정보 목록조회",
+        "operationId": "TODZ_CRA_RACER_INFO",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "serviceKey",
+          "description": "공공데이터포털에서 받은 인증키",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "pageNo",
+          "description": "페이지번호",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "numOfRows",
+          "description": "한 페이지 결과 수",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "resultType",
+          "description": "결과형식",
+          "type": "string",
+          "required": true,
+          "in": "query"
+        },
+        {
+          "name": "stnd_yr",
+          "description": "경기연도",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "racer_nm",
+          "description": "선수명",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        },
+        {
+          "name": "period_no",
+          "description": "기수번호",
+          "type": "string",
+          "required": false,
+          "in": "query"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "TODZ_CRA_RACER_INFO_response": {
+      "type": "object",
+      "properties": {
+        "header": {
+          "type": "object",
+          "description": "header",
+          "properties": {
+            "resultCode": {
+              "type": "string",
+              "description": "결과코드"
+            },
+            "resultMsg": {
+              "type": "string",
+              "description": "결과메시지"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "description": "body",
+          "properties": {
+            "pageNo": {
+              "type": "string",
+              "description": "페이지번호"
+            },
+            "totalCount": {
+              "type": "string",
+              "description": "전체 결과 수"
+            },
+            "numOfRows": {
+              "type": "string",
+              "description": "한 페이지 결과 수"
+            },
+            "items": {
+              "type": "object",
+              "description": "items",
+              "properties": {
+                "item": {
+                  "type": "object",
+                  "description": "item",
+                  "properties": {
+                    "racer_nm": {
+                      "type": "string",
+                      "description": "선수명"
+                    },
+                    "racer_grd_cd": {
+                      "type": "string",
+                      "description": "등급코드"
+                    },
+                    "run_cnt": {
+                      "type": "string",
+                      "description": "출주회차수"
+                    },
+                    "run_day_tcnt": {
+                      "type": "string",
+                      "description": "출전횟수"
+                    },
+                    "rank1_tcnt": {
+                      "type": "string",
+                      "description": "1위횟수"
+                    },
+                    "win_rate": {
+                      "type": "string",
+                      "description": "승률"
+                    },
+                    "rank2_tcnt": {
+                      "type": "string",
+                      "description": "2위횟수"
+                    },
+                    "high_rate": {
+                      "type": "string",
+                      "description": "연대율"
+                    },
+                    "rank3_tcnt": {
+                      "type": "string",
+                      "description": "3위횟수"
+                    },
+                    "high_3_rate": {
+                      "type": "string",
+                      "description": "삼연대율"
+                    },
+                    "rank4_tcnt": {
+                      "type": "string",
+                      "description": "4위횟수"
+                    },
+                    "stnd_yr": {
+                      "type": "string",
+                      "description": "경기연도"
+                    },
+                    "rank5_tcnt": {
+                      "type": "string",
+                      "description": "5위횟수"
+                    },
+                    "rank6_tcnt": {
+                      "type": "string",
+                      "description": "6위횟수"
+                    },
+                    "rank7_tcnt": {
+                      "type": "string",
+                      "description": "7위횟수"
+                    },
+                    "rank8_tcnt": {
+                      "type": "string",
+                      "description": "8위횟수"
+                    },
+                    "rank9_tcnt": {
+                      "type": "string",
+                      "description": "9위횟수"
+                    },
+                    "elim_tcnt": {
+                      "type": "string",
+                      "description": "실격횟수"
+                    },
+                    "down_po_cnt": {
+                      "type": "string",
+                      "description": "낙차포기수"
+                    },
+                    "go_po_tcnt": {
+                      "type": "string",
+                      "description": "고장포기횟수"
+                    },
+                    "period_no": {
+                      "type": "string",
+                      "description": "기수번호"
+                    },
+                    "row_num": {
+                      "type": "string",
+                      "description": "순번"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "swaggerOprtinVOs": [
+    {
+      "oprtinUrl": "https://openapi.kspo.or.kr/web/service/SRVC_CRA_RACER_INFO/TODZ_CRA_RACER_INFO",
+      "oprtinNm": "경륜 선수정보 목록조회",
+      "oprtinDc": "경륜 선수정보 목록조회",
+      "gwSvcNm": "TODZ_CRA_RACER_INFO",
+      "operationId": "TODZ_CRA_RACER_INFO",
+      "publicDataTyDetailCode": "PRDE02",
+      "reqList": [
+        {
+          "paramtrNm": "serviceKey",
+          "paramtrDc": "공공데이터포털에서 받은 인증키",
+          "paramtrBassValue": "-",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "pageNo",
+          "paramtrDc": "페이지번호",
+          "paramtrBassValue": "1",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "numOfRows",
+          "paramtrDc": "한 페이지 결과 수",
+          "paramtrBassValue": "10",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "resultType",
+          "paramtrDc": "결과형식",
+          "paramtrBassValue": "XML",
+          "paramtrTy": "string",
+          "paramtrDivision": "필수",
+          "ck": true
+        },
+        {
+          "paramtrNm": "stnd_yr",
+          "paramtrDc": "경기연도",
+          "paramtrBassValue": "2025",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "racer_nm",
+          "paramtrDc": "선수명",
+          "paramtrBassValue": "허은회",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        },
+        {
+          "paramtrNm": "period_no",
+          "paramtrDc": "기수번호",
+          "paramtrBassValue": "1",
+          "paramtrTy": "string",
+          "paramtrDivision": "옵션",
+          "ck": true
+        }
+      ],
+      "resList": [
+        {
+          "paramtrNm": "header",
+          "paramtrDc": "header",
+          "arrayYn": "N",
+          "paramtrDefNm": "#/definitions/CRA_RACER_INFO-header",
+          "subDefNm": "CRA_RACER_INFO-header",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true,
+          "subParam": [
+            {
+              "paramtrNm": "resultCode",
+              "paramtrDc": "결과코드",
+              "arrayYn": "N",
+              "paramtrDefNm": "",
+              "paramtrTy": "string",
+              "paramtrDivision": "필수",
+              "ck": true
+            },
+            {
+              "paramtrNm": "resultMsg",
+              "paramtrDc": "결과메시지",
+              "arrayYn": "N",
+              "paramtrDefNm": "",
+              "paramtrTy": "string",
+              "paramtrDivision": "필수",
+              "ck": true
+            }
+          ]
+        },
+        {
+          "paramtrNm": "body",
+          "paramtrDc": "body",
+          "arrayYn": "N",
+          "paramtrDefNm": "#/definitions/CRA_RACER_INFO-body",
+          "subDefNm": "CRA_RACER_INFO-body",
+          "paramtrTy": "object",
+          "paramtrDivision": "필수",
+          "ck": true,
+          "subParam": [
+            {
+              "paramtrNm": "pageNo",
+              "paramtrDc": "페이지번호",
+              "arrayYn": "N",
+              "paramtrDefNm": "",
+              "paramtrTy": "string",
+              "paramtrDivision": "필수",
+              "ck": true
+            },
+            {
+              "paramtrNm": "totalCount",
+              "paramtrDc": "전체 결과 수",
+              "arrayYn": "N",
+              "paramtrDefNm": "",
+              "paramtrTy": "string",
+              "paramtrDivision": "필수",
+              "ck": true
+            },
+            {
+              "paramtrNm": "numOfRows",
+              "paramtrDc": "한 페이지 결과 수",
+              "arrayYn": "N",
+              "paramtrDefNm": "",
+              "paramtrTy": "string",
+              "paramtrDivision": "필수",
+              "ck": true
+            },
+            {
+              "paramtrNm": "items",
+              "paramtrDc": "items",
+              "arrayYn": "N",
+              "paramtrDefNm": "#/definitions/CRA_RACER_INFO-items",
+              "subDefNm": "CRA_RACER_INFO-items",
+              "paramtrTy": "object",
+              "paramtrDivision": "필수",
+              "ck": true,
+              "subParam": [
+                {
+                  "paramtrNm": "item",
+                  "paramtrDc": "item",
+                  "arrayYn": "N",
+                  "paramtrDefNm": "#/definitions/CRA_RACER_INFO-item",
+                  "subDefNm": "CRA_RACER_INFO-item",
+                  "paramtrTy": "object",
+                  "paramtrDivision": "필수",
+                  "ck": true,
+                  "subParam": [
+                    {
+                      "paramtrNm": "racer_nm",
+                      "paramtrDc": "선수명",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "racer_grd_cd",
+                      "paramtrDc": "등급코드",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "run_cnt",
+                      "paramtrDc": "출주회차수",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "run_day_tcnt",
+                      "paramtrDc": "출전횟수",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "rank1_tcnt",
+                      "paramtrDc": "1위횟수",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "win_rate",
+                      "paramtrDc": "승률",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "rank2_tcnt",
+                      "paramtrDc": "2위횟수",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "high_rate",
+                      "paramtrDc": "연대율",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "rank3_tcnt",
+                      "paramtrDc": "3위횟수",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "high_3_rate",
+                      "paramtrDc": "삼연대율",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "rank4_tcnt",
+                      "paramtrDc": "4위횟수",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "stnd_yr",
+                      "paramtrDc": "경기연도",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "rank5_tcnt",
+                      "paramtrDc": "5위횟수",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "rank6_tcnt",
+                      "paramtrDc": "6위횟수",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "rank7_tcnt",
+                      "paramtrDc": "7위횟수",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "rank8_tcnt",
+                      "paramtrDc": "8위횟수",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "rank9_tcnt",
+                      "paramtrDc": "9위횟수",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "elim_tcnt",
+                      "paramtrDc": "실격횟수",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "down_po_cnt",
+                      "paramtrDc": "낙차포기수",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "go_po_tcnt",
+                      "paramtrDc": "고장포기횟수",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "period_no",
+                      "paramtrDc": "기수번호",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    },
+                    {
+                      "paramtrNm": "row_num",
+                      "paramtrDc": "순번",
+                      "arrayYn": "N",
+                      "paramtrDefNm": "",
+                      "paramtrTy": "string",
+                      "paramtrDivision": "옵션",
+                      "ck": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{# 화면 여러 곳에서 같은 모양으로 나와야 하는 조각들.
+   여기 없으면 같은 것이 페이지마다 조금씩 달라지고, 어느 쪽이 맞는지 알 수 없게 된다. #}
+
+{# 광고 자리. client 나 slot 이 비어 있으면 아무것도 렌더링하지 않는다 —
+   설정이 없는 채로 빈 상자가 남으면 화면만 성기게 된다.
+   광고임을 밝히는 라벨을 붙인다. 예상 내용과 광고가 섞여 보이면 안 된다. #}
+{% macro ad(adsense, slot_key, label='광고') %}
+{% set slot = adsense.get(slot_key) %}
+{% if adsense.get('client') and slot %}
+<aside class="ad-slot" aria-label="광고">
+  <span class="ad-label">{{ label }}</span>
+  <ins class="adsbygoogle" style="display:block"
+       data-ad-client="{{ adsense.client }}"
+       data-ad-slot="{{ slot }}"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</aside>
+{% endif %}
+{% endmacro %}
+
+{# 배번 표시. 실제 경륜 배번 색(1 백 · 2 흑 · 3 적 · 4 청 · 5 황 · 6 녹 · 7 분홍)을
+   배경으로 쓰되 **숫자를 그대로 크게** 적는다. 색만으로 구분하면 색각 이상에서
+   3(적)과 6(녹)이 섞이므로 숫자가 곧 본문이고 색은 거드는 역할이다. #}
+{% macro back_no(n, size='m') %}<span class="bn bn-{{ size }} bn-c{{ n }}" title="{{ n }}번">{{ n }}</span>{% endmacro %}
+
+{# 전법 칩. 경륜에서 자리보다 중요한 축이라 목록에서도 보이게 한다. #}
+{% macro tactic_chip(name) %}{% if name %}<span class="tc tc-{{ name }}">{{ name }}</span>{% endif %}{% endmacro %}
+
+{% macro version_badge(version, version_label) %}
+  {%- set v = version_label.get(version) -%}
+  {%- if v -%}
+  <span class="badge badge-{{ 'live' if version == 'v1' else 'oos' }}" title="{{ v[1] }}">{{ v[0] }}</span>
+  {%- endif -%}
+{% endmacro %}
+
+{# 경주 카드 — 목록에서 눌러 들어가지 않아도 예상까지 읽히게 한다.
+
+   **표가 아니라 카드인 이유**: 일곱 명을 표로 늘어놓으면 좁은 화면에서 가로
+   스크롤이 생긴다. 카드는 폭이 모자라면 다음 줄로 흐르므로 어떤 화면에서도
+   넘치지 않는다.
+
+   카드 전체가 링크라 손가락으로 어디를 눌러도 상세로 간다.
+
+   data-post 는 **보는 사람의 시계**로 지난 경주를 흐리게 하기 위한 값이다.
+   빌드 시각으로 정해 두면 몇 시간 뒤에는 틀린 표시가 된다. #}
+{% macro race_card(r, version_label, show_result=true, mark_past=false, show_version=false, show_date=false) %}
+{% set tag = 'a' if r.has_page else 'div' %}
+<{{ tag }} class="ri"{% if r.has_page %} href="{{ base }}/race/{{ r.race_key }}/"{% endif %}
+   {%- if mark_past and r.race_ymd and r.post_time %} data-post="{{ r.race_ymd }}{{ r.post_time | replace(':', '') }}"{% endif %}>
+  <div class="ri-head">
+    <b class="ri-no">{{ r.race_no }}R</b>
+    <span class="ri-time">{{ r.post_time or '—' }}</span>
+    {% if show_date and r.race_ymd %}<span class="ri-date">{{ r.race_ymd | date_ko }}</span>{% endif %}
+    {# 경주 급은 선발/우수/특선 셋뿐이라 항상 적어도 잡음이 되지 않는다 —
+       오히려 급이 다르면 같은 배번이라도 전혀 다른 경주다. #}
+    {% if r.race_grade %}<span class="chip grd-{{ r.race_grade }}">{{ r.race_grade }}</span>{% endif %}
+    {% if show_version %}{{ version_badge(r.version, version_label) }}{% endif %}
+    {% if show_result %}
+    <span class="ri-hit">
+      {% if r.has_result and r.outcome %}
+        {% if r.outcome.top1_ord and r.outcome.top1_ord > 0 %}<span class="ord ord-{{ r.outcome.top1_ord }}">{{ r.outcome.top1_ord }}착</span>{% endif %}
+        {% if r.outcome.hit_win %}<span class="hit">단승</span>{% endif %}
+        {% if r.outcome.hit_quinella %}<span class="hit">복승</span>{% endif %}
+        {% if r.outcome.hit_trio %}<span class="hit">삼복승</span>{% endif %}
+        {% if not r.outcome.hit_win and not r.outcome.hit_place %}<span class="miss">불발</span>{% endif %}
+      {% endif %}
+    </span>
+    {% endif %}
+  </div>
+  {# 일곱 명을 배번 순 그리드로. 칸이 줄 맞춰져 카드를 여러 개 훑어도 눈이
+     자리를 다시 찾을 필요가 없다. 폭이 모자라면 4열·3열로 접힌다. #}
+  <div class="ri-picks">
+    {# 예상이 없는 경주 — 자동 실행이 발주 뒤에 돌면 그날 앞 경주는 예상을
+       만들지 않는다(발주 후에 만든 예상은 예상이 아니므로). 편성은 남기고
+       그 사실만 적는다. #}
+    {% if not r.picks %}<span class="pk-none">예상 없음</span>{% endif %}
+    {% for p in r.picks %}
+    {# 확률을 칸 아래 막대로도 그린다. 숫자만 보면 37% 와 30% 의 차이를 읽는 데
+       시간이 걸리는데, 길이는 한눈에 비교된다. #}
+    <span class="pk{{ ' pk-hi' if p.mark else '' }}{{ ' pk-win' if p.ord == 1 else '' }}"
+          style="--p: {{ ((p.p_win or 0) * 100) | round(1) }}%">
+      <span class="pk-l">{{ back_no(p.back_no, "s") }}<b class="mark">{{ p.mark }}</b></span>
+      <span class="pk-nm">{{ p.racer }}</span>
+      <small>{{ p.p_win | pct(0) }}</small>
+    </span>
+    {% endfor %}
+  </div>
+</{{ tag }}>
+{% endmacro %}
+
+{# 적중률 표. 표본 수를 반드시 함께 적는다 — 30경주짜리 60%와
+   3,000경주짜리 48%는 다른 말이다. #}
+{% macro bet_table(by_bet) %}
+{# 여섯 열이라 좁은 화면에서 넘친다. 페이지 전체가 가로로 밀리면 본문까지
+   읽기 어려워지므로, 표만 그 안에서 스크롤하게 가둔다. #}
+<div class="scroll">
+<table class="tbl tbl-bet">
+  <thead>
+    <tr><th>승식</th><th class="r">경주</th><th class="r">매수</th>
+        <th class="r">적중률</th><th class="r">회수율</th>
+        <th class="r">고배당 절단</th></tr>
+  </thead>
+  <tbody>
+  {% for b in by_bet %}
+    <tr{% if b.is_total %} class="total"{% endif %}>
+      <td>{{ b.name }}</td>
+      <td class="r">{{ '{:,}'.format(b.n_races) }}</td>
+      <td class="r">{{ b.tickets }}</td>
+      <td class="r">{{ b.hit_rate | pct }}</td>
+      <td class="r {{ 'plus' if b.roi and b.roi >= 1 else 'minus' }}">{{ b.roi | pct }}</td>
+      <td class="r minus">{{ b.roi_trim | pct }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<p class="note">
+  <b>고배당 절단</b>은 회수액 상위 1%를 그 분위값으로 눌러 다시 계산한
+  회수율입니다. 두 값의 차이가 크면 그 회수율은 <b>소수의 고배당 적중에
+  매달려 있다</b>는 뜻입니다 — 다음에도 그럴 것이라는 보장이 아닙니다.
+</p>
+{% endmacro %}
