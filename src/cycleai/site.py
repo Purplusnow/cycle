@@ -19,6 +19,7 @@ DB → Jinja2 → ``dist/`` 정적 HTML. 서버가 없으므로 전부 빌드 �
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import logging
 import os
@@ -124,11 +125,26 @@ def fmt_date(ymd: Optional[str]) -> str:
         return ""
     s = str(ymd)
     try:
-        import datetime as dt
         d = dt.date(int(s[:4]), int(s[4:6]), int(s[6:8]))
     except ValueError:
         return s
     return f"{d.isoformat()} ({WEEKDAY_KO[d.weekday()]})"
+
+
+def _post_dt(row: Dict) -> Optional["dt.datetime"]:
+    """경주일자 + 발주시각 → datetime. 하나라도 없으면 None.
+
+    '아직 안 달린 경주'를 빌드 시점에 가려내는 데 쓴다. 화면에서 지난 경주를
+    흐리게 하는 것은 **보는 사람의 시계**로 하지만(base.html), 어느 날을 첫
+    화면에 걸지는 빌드 때 정해야 한다.
+    """
+    ymd, hhmm = row.get("race_ymd"), row.get("post_time")
+    if not ymd or not hhmm:
+        return None
+    try:
+        return dt.datetime.strptime(f"{str(ymd)[:8]} {str(hhmm)[:5]}", "%Y%m%d %H:%M")
+    except ValueError:
+        return None
 
 
 def fmt_md(ymd: Optional[str]) -> str:
@@ -526,29 +542,59 @@ def build(db: str, out: Path, cfg: Dict) -> None:
         # 이상한 목록이 된다. 무엇을 밀었는지도 함께 사라진다.
         live_sorted = sorted(live, key=lambda r: (r["race_ymd"] or "",
                                                   r["race_no"] or 0))
-        pending = [r["race_ymd"] for r in live_sorted
-                   if not r["has_result"] and r["race_ymd"]]
-        if pending:
-            target_day = min(pending)          # 아직 남은 경주가 있는 개최일
+        # 아직 착순이 안 들어온 개최일들. 여기에 **하루 이상이 겹친다.**
+        pending_days = sorted({r["race_ymd"] for r in live_sorted
+                               if r["race_ymd"] and not r["has_result"]})
+
+        # 그중 **아직 발주하지 않은 경주가 남은** 가장 이른 날을 첫 화면에 건다.
+        #
+        # 경정에서는 'has_result 가 없는 가장 이른 날' 로 골라도 됐다. 수·목
+        # 편성이라 다음 개최일이 오기 전에 결과가 들어왔기 때문이다. **경륜은
+        # 금·토·일 연속 편성이라 그 가정이 깨진다** — 금요일 결과는 토요일
+        # 아침에야 올라오는데, 그때는 토요일 경주도 미결과라 min() 이 이미 다
+        # 끝난 금요일을 고른다. 실제로 8/14 저녁에 첫 화면이 8/14 를 계속
+        # 보여주고 8/15 예상은 어디에도 나오지 않았다.
+        future = [d for d in pending_days
+                  if any(_post_dt(r) and _post_dt(r) > now_kst()
+                         for r in live_sorted if r["race_ymd"] == d)]
+        if future:
+            target_day = future[0]
+        elif pending_days:
+            # 남은 경주가 없으면 가장 **최근** 개최일. 여기서 min 을 쓰면
+            # 결과가 늦게 들어오는 옛날 하루에 첫 화면이 붙들린다.
+            target_day = pending_days[-1]
         else:
             days_all = [r["race_ymd"] for r in live_sorted if r["race_ymd"]]
             target_day = max(days_all) if days_all else None
+
         # 예상이 있는 경주만 뽑으면 편성에 구멍이 난다. 그날 전체를 다시 읽는다.
-        upcoming = []
-        if target_day:
-            for row in conn.execute(DAY_SQL, (LIVE_VERSION, target_day)):
+        def _day_races(ymd: str) -> List[Dict]:
+            rows = []
+            for row in conn.execute(DAY_SQL, (LIVE_VERSION, ymd)):
                 r = _dict(row)
                 r["date_label"] = fmt_date(r["race_ymd"])
                 r["version"] = LIVE_VERSION
-                upcoming.append(r)
+                rows.append(r)
+            return rows
 
-        # 결과 아카이브는 그날을 빼고 쌓는다 — 같은 경주가 두 번 나오지 않게.
-        finished = [r for r in live if r["has_result"] and r["race_ymd"] != target_day]
-        finished += [r for r in oos if r["has_result"] and r["race_ymd"] != target_day]
+        upcoming = _day_races(target_day) if target_day else []
+        # 첫 화면에 걸지 않은 미결과 개최일도 페이지와 칩은 만들어 둔다.
+        # 그러지 않으면 오늘 경주가 끝난 순간, 결과가 들어오기 전까지 그날
+        # 예상이 사이트에서 통째로 사라진다 — 발주 전에 확정 저장했다는 기록이
+        # 정작 가장 볼 만한 시점에 없어지는 셈이다.
+        other_pending = [r for d in pending_days if d != target_day
+                         for r in _day_races(d)]
+
+        # 결과 아카이브는 미결과 개최일을 빼고 쌓는다 — 같은 경주가 두 번
+        # 나오지 않게.
+        shown = set(pending_days)
+        finished = [r for r in live if r["has_result"] and r["race_ymd"] not in shown]
+        finished += [r for r in oos if r["has_result"] and r["race_ymd"] not in shown]
         finished = finished[: bcfg.get("results_limit", 300)]
 
         # ── 경주 상세 ────────────────────────────────────────────
-        detail_targets = upcoming + finished[: bcfg.get("past_races", 400)]
+        detail_targets = (upcoming + other_pending
+                          + finished[: bcfg.get("past_races", 400)])
         seen = set()
         race_pages: List[Dict] = []
         for r in detail_targets:
@@ -574,7 +620,7 @@ def build(db: str, out: Path, cfg: Dict) -> None:
                        race=page, page_url=f"/race/{r['race_key']}/", **ctx_base))
 
         by_key = {p["race_key"]: p for p in race_pages}
-        for lst in (upcoming, finished):
+        for lst in (upcoming, other_pending, finished):
             for r in lst:
                 p = by_key.get(r["race_key"])
                 r["picks"] = p.get("picks") if p else []
@@ -583,7 +629,7 @@ def build(db: str, out: Path, cfg: Dict) -> None:
 
         # ── 경주일 ───────────────────────────────────────────────
         days: Dict[str, List[Dict]] = {}
-        for r in upcoming + finished:
+        for r in upcoming + other_pending + finished:
             if r["race_ymd"]:
                 days.setdefault(r["race_ymd"], []).append(r)
         for ymd, rows in days.items():
