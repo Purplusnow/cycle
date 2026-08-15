@@ -132,6 +132,14 @@ h3 { font-size: 14px; margin: 22px 0 8px; color: var(--dim); letter-spacing: .02
   text-align: left; font-weight: 600; font-size: 12px; color: var(--dim);
   border-bottom: 1px solid var(--line); padding: 8px 8px; white-space: nowrap;
 }
+/* **머리글도 값과 같은 쪽으로 붙인다.**
+ *
+ * `.tbl th` 는 (0,1,1) 이고 `.r` 은 (0,1,0) 이라, th 에 class="r" 을 줘도
+ * `.tbl th { text-align: left }` 가 이긴다. 그래서 숫자 열은 값이 오른쪽,
+ * 머리글이 왼쪽으로 갈려 어느 숫자가 어느 열인지 눈으로 못 따라간다 — 열이
+ * 여섯 개인 승식별 표에서 특히 심했다. 오류가 아니라 '읽히지 않는' 방식으로만
+ * 드러나서 오래 남아 있었다. */
+.tbl th.r { text-align: right; }
 .tbl td {
   padding: 9px 8px; border-bottom: 1px solid var(--line);
   font-variant-numeric: tabular-nums; vertical-align: middle;
