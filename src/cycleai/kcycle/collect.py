@@ -259,6 +259,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     log.info("수집 대상 연도: %s ~ %s (%d개)", years[0], years[-1], len(years))
 
     with session(Path(args.db)) as conn:
+        failed = []
         for year in years:
             try:
                 got = collect_year(client, conn, year, force=args.force,
@@ -267,6 +268,7 @@ def main(argv: Optional[List[str]] = None) -> int:
                 # 한 해가 막혔다고 나머지를 버리지 않는다. 호출 한도 초과라면
                 # 여기서 멈추는 것이 맞고, 그때 이미 받은 해는 DB 에 남는다.
                 log.error("%d년 수집 실패: %s", year, e)
+                failed.append(str(year))
                 if e.code in ("22", "29"):
                     log.error("호출 한도에 걸렸습니다. 내일 이어서 돌리면 "
                               "이미 받은 해는 건너뜁니다.")
@@ -275,12 +277,31 @@ def main(argv: Optional[List[str]] = None) -> int:
             conn.commit()
             log.info("  %d: %s", year, got or "이미 받음")
 
-        collect_sanctions(client, conn)
+        # **제재선수 하나가 전체 수집을 죽이면 안 된다.**
+        #
+        # 실측(2026-08-16 02:13): 이 API 가 ConnectTimeout 을 내면서 예외가
+        # main 밖으로 나갔고, 워크플로는 설계대로 '기존 자료로 진행' 했다. 그
+        # 결과 **그날 새로 올라온 배당이 통째로 빠진 채 사이트가 다시 구워졌다.**
+        # 없어도 예측·검증이 되는 보조 자료 때문에 핵심 자료를 잃은 셈이다.
+        #
+        # 연도별 수집은 이미 개별로 감싸져 있었는데 여기만 맨몸이었다.
+        try:
+            collect_sanctions(client, conn)
+        except KcycleApiError as e:
+            log.warning("제재선수 수집 실패 — 건너뜁니다: %s", e)
+            failed.append("제재선수")
+
         linked = link_result_back_no(conn)
         flags = mark_flags(conn)
         conn.commit()
         log.info("배번 연결 %d행, 플래그 %s", linked, flags)
         log.info("합계: %s", counts(conn))
+        if failed:
+            # 받은 것은 이미 커밋됐다. 실패를 남기되 **0 으로 끝낸다** —
+            # 여기서 1 을 돌려주면 워크플로가 통째로 재시도하면서, 방금 받아
+            # 놓은 것까지 '실패한 실행'으로 취급한다.
+            log.warning("일부 수집 실패: %s (받은 자료는 그대로 남았습니다)",
+                        ", ".join(failed))
     return 0
 
 
