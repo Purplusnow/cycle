@@ -55,7 +55,16 @@ def _years(args_years: Optional[List[int]], mode: str) -> List[int]:
 
 def collect_year(client: KcycleClient, conn, year: int, *, force: bool = False,
                  heavy: bool = True) -> Dict[str, int]:
-    """한 해분을 통째로 받아 넣는다."""
+    """한 해분을 통째로 받아 넣는다.
+
+    **API 구간마다 커밋한다.** 끝에서 한 번만 커밋하면, 뒤쪽 구간이 네트워크로
+    실패하는 순간 앞에서 이미 받아 놓은 것까지 함께 롤백된다 — 실측
+    (2026-08-16)에서 상대전적 구간이 타임아웃 나면서 그 실행의 착순·배당이
+    통째로 날아갔고, 사이트는 하루 전 자료로 다시 구워졌다.
+
+    해외 러너에서 data.go.kr 접속은 자주 끊긴다. 한 번에 다 받는 것을 전제로
+    두면 안 되고, **매 실행이 조금씩이라도 전진하게** 만들어야 한다.
+    """
     y = str(year)
     out: Dict[str, int] = {}
     this_year = today_kst().year
@@ -82,6 +91,7 @@ def collect_year(client: KcycleClient, conn, year: int, *, force: bool = False,
         upsert(conn, "races", list(races.values()), ["race_key"])
         upsert(conn, "entries", entries, ["race_key", "back_no"])
         log_fetch(conn, "race_card", y, len(recs))
+        conn.commit()
         out["entries"] = len(entries)
 
     # --- 착순: 레이블. **창원·부산도 넣는다** (광명 선수의 원정 성적이다) ---
@@ -111,6 +121,7 @@ def collect_year(client: KcycleClient, conn, year: int, *, force: bool = False,
             upsert(conn, "results", rows, ["race_key", "racer_nm"])
             total += len(rows)
         log_fetch(conn, "race_rank", y, total)
+        conn.commit()
         out["results"] = total
 
     # --- 배당: 검증. 연 단위로 통째로 온다 ---
@@ -120,6 +131,7 @@ def collect_year(client: KcycleClient, conn, year: int, *, force: bool = False,
         rows = [r for rec in recs for r in N.payoff_rows(rec)]
         upsert(conn, "payoffs", rows, ["race_key", "pool"])
         log_fetch(conn, "payoff", y, len(recs))
+        conn.commit()
         out["payoffs"] = len(rows)
 
     # --- 선수 연도별 집계: 사전값 ---
@@ -129,6 +141,7 @@ def collect_year(client: KcycleClient, conn, year: int, *, force: bool = False,
         rows = list(filter(None, (N.racer_year_row(x) for x in recs)))
         upsert(conn, "racer_year", rows, ["stnd_yr", "racer_nm"])
         log_fetch(conn, "racer_info", y, len(recs))
+        conn.commit()
         out["racer_year"] = len(rows)
 
     # --- 낙차·사고: 선수 단위 이력 ---
@@ -140,6 +153,7 @@ def collect_year(client: KcycleClient, conn, year: int, *, force: bool = False,
         upsert(conn, "accidents", rows,
                ["stnd_yr", "week_tcnt", "day_tcnt", "race_no", "racer_nm"])
         log_fetch(conn, "down_accident", y, len(recs))
+        conn.commit()
         out["accidents"] = len(rows)
 
     if not heavy:
@@ -155,6 +169,7 @@ def collect_year(client: KcycleClient, conn, year: int, *, force: bool = False,
         rows = list(filter(None, (N.oppo_row(x) for x in recs)))
         upsert(conn, "oppo", rows, ["stnd_yr", "racer_nm", "oppo_nm"])
         log_fetch(conn, "oppo_win", y, len(recs))
+        conn.commit()
         out["oppo"] = len(rows)
 
     # --- 회차별 득점: 회차마다 한 번씩. 최근 연도만 ---
@@ -177,6 +192,7 @@ def collect_year(client: KcycleClient, conn, year: int, *, force: bool = False,
             upsert(conn, "tms_score", rows,
                    ["stnd_yr", "week_tcnt", "day_tcnt", "meet_nm", "racer_nm"])
             log_fetch(conn, "tms_score", coord, len(recs))
+            conn.commit()
             total += len(rows)
             # 그 해가 아직 안 온 회차는 0건이다. 연속 0건이면 뒤도 비어 있다.
             if not recs and wk > 1:
