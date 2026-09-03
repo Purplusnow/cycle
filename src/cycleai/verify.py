@@ -213,6 +213,23 @@ def race_level(df: pd.DataFrame, payoffs: Dict) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def ci95(returns: pd.Series) -> Optional[float]:
+    """회수율의 95% 신뢰구간 반폭.
+
+    **회수율은 표본이 얕을 때 100% 를 우습게 넘나든다.** 공개 기록 155경주에서
+    단승 회수율이 106.1% 로 나왔는데, 오차가 ±16.4%p 라 구간이 [89.7%, 122.5%]
+    였다 — 100% 를 품는다. 같은 지표가 18,968경주 검증에서는 92.9% 였다.
+
+    숫자만 적으면 읽는 쪽은 '수익이 난다'로 읽는다. ± 를 옆에 두면 그 문장이
+    아직 성립하지 않는다는 것이 같은 줄에서 보인다. 절단 회수율이 '꼬리에
+    매달렸는가'를 잡는다면, 이 값은 '표본이 말할 수 있는가'를 잡는다.
+    """
+    s = pd.to_numeric(returns, errors="coerce").dropna()
+    if len(s) < 2:
+        return None
+    return float(1.96 * s.std(ddof=1) / (len(s) ** 0.5))
+
+
 def summarize(rl: pd.DataFrame) -> Dict:
     if rl.empty:
         return {"n_races": 0}
@@ -222,6 +239,7 @@ def summarize(rl: pd.DataFrame) -> Dict:
         "hit_place": float(rl["hit_place"].mean()),
         "hit_top3_has_winner": float(rl["hit_top3_has_winner"].mean()),
         "roi_win": float(rl["payout_win"].sum() / len(rl)),
+        "roi_win_ci": ci95(rl["payout_win"]),
         "avg_win_payout": (float(rl.loc[rl["hit_win"] == 1, "payout_win"].mean())
                            if (rl["hit_win"] == 1).any() else None),
         "first_date": str(rl["race_date"].min())[:10],
@@ -246,6 +264,7 @@ def bet_summary(rl: pd.DataFrame) -> List[Dict]:
         return []
     agg: Dict[str, Dict[str, float]] = {}
     rets: Dict[str, List[float]] = {}
+    pers: Dict[str, List[float]] = {}
     for bets in rl["bets"]:
         for name, b in (bets or {}).items():
             a = agg.setdefault(name, {"n": 0, "hit": 0, "cost": 0.0, "payout": 0.0})
@@ -254,6 +273,8 @@ def bet_summary(rl: pd.DataFrame) -> List[Dict]:
             a["cost"] += b["cost"]
             a["payout"] += b["payout"]
             rets.setdefault(name, []).append(float(b["payout"]))
+            # 박스는 통 수가 다르므로 **통당** 회수액으로 모아야 구간이 맞는다.
+            pers.setdefault(name, []).append(float(b["payout"]) / max(b["cost"], 1))
 
     def _trim(name: str, cost: float) -> Optional[float]:
         """회수액 상위 1% 를 그 분위값으로 눌러 다시 계산한 회수율."""
@@ -280,6 +301,7 @@ def bet_summary(rl: pd.DataFrame) -> List[Dict]:
             "hit_rate": a["hit"] / a["n"],
             "roi": a["payout"] / a["cost"] if a["cost"] else None,
             "roi_trim": _trim(name, a["cost"]),
+            "roi_ci": ci95(pd.Series(pers.get(name, []))),
         })
     if tot["cost"]:
         races = max((r["n_races"] for r in out if r["name"] in BET_ORDER), default=0)
@@ -291,6 +313,7 @@ def bet_summary(rl: pd.DataFrame) -> List[Dict]:
             "hit_rate": tot["hit"] / tot["n"], "roi": tot["payout"] / tot["cost"],
             "roi_trim": (float(pd.Series(all_rets).clip(upper=cap).sum() / tot["cost"])
                          if cap is not None else None),
+            "roi_ci": ci95(pd.Series([v for n in BET_ORDER for v in pers.get(n, [])])),
             "is_total": True,
         })
     return out

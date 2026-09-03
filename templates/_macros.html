@@ -108,7 +108,8 @@
       <td class="r">{{ '{:,}'.format(b.n_races) }}</td>
       <td class="r">{{ b.tickets }}</td>
       <td class="r">{{ b.hit_rate | pct }}</td>
-      <td class="r {{ 'plus' if b.roi and b.roi >= 1 else 'minus' }}">{{ b.roi | pct }}</td>
+      <td class="r {{ 'plus' if b.roi and b.roi >= 1 else 'minus' }}">{{ b.roi | pct }}
+        {% if b.roi_ci %}<small>±{{ (b.roi_ci * 100) | round(1) }}%p</small>{% endif %}</td>
       <td class="r minus">{{ b.roi_trim | pct }}</td>
     </tr>
   {% endfor %}
@@ -119,5 +120,11 @@
   <b>고배당 절단</b>은 회수액 상위 1%를 그 분위값으로 눌러 다시 계산한
   회수율입니다. 두 값의 차이가 크면 그 회수율은 <b>소수의 고배당 적중에
   매달려 있다</b>는 뜻입니다 — 다음에도 그럴 것이라는 보장이 아닙니다.
+</p>
+<p class="note">
+  회수율 아래 <b>±</b>는 95% 신뢰구간의 폭입니다. <b>구간이 100%를 걸치면 그
+  회수율은 아직 손익을 말하지 못합니다</b> — 표본이 얕으면 100%를 우습게
+  넘나듭니다. 절단이 '꼬리에 매달렸는가'를 잡는다면, ±는 '표본이 말할 수
+  있는가'를 잡습니다.
 </p>
 {% endmacro %}

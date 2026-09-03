@@ -68,7 +68,8 @@
       <div class="stat"><b>{{ o.hit_win | pct }}</b><span>1순위 1착</span></div>
       <div class="stat"><b>{{ o.hit_place | pct }}</b><span>1순위 2착 이내</span></div>
       <div class="stat"><b>{{ o.hit_top3_has_winner | pct }}</b><span>상위 3명 안에 1착</span></div>
-      <div class="stat"><b class="{{ 'plus' if o.roi_win >= 1 else 'minus' }}">{{ o.roi_win | pct }}</b><span>단승 회수율</span></div>
+      <div class="stat"><b class="{{ 'plus' if o.roi_win >= 1 else 'minus' }}">{{ o.roi_win | pct }}</b><span>단승 회수율</span>
+        {% if o.roi_win_ci %}<small>95% 구간 {{ (o.roi_win - o.roi_win_ci) | pct(0) }} ~ {{ (o.roi_win + o.roi_win_ci) | pct(0) }}</small>{% endif %}</div>
     </div>
     <p class="fineprint">
       {{ o.first_date }} ~ {{ o.last_date }} · {{ '{:,}'.format(o.n_races) }}경주
