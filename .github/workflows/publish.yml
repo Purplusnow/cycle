@@ -1,33 +1,39 @@
-# 개최일에 맞춰 자료를 받아 사이트를 다시 굽고 GitHub Pages 로 올린다.
+# 자료를 받아 사이트를 다시 굽고 GitHub Pages 로 올린다.
 #
-# 광명 경륜은 **금·토·일**에 시행하고 발주는 11:20~21:20 KST 다
-# (실측: 2025년 이후 금 84일 · 토 84일 · 일 83일, 월요일이 4일).
+# 광명 경륜은 **금·토·일**에 시행하고 발주는 11:20~21:20 KST 다. 착순·배당은
+# 그날 밤이 아니라 **다음 날 새벽 02~04 KST** 에 올라온다(실측).
 #
-# 그런데도 **매일** 돈다. 개최일만 돌리면 일요일 결과가 다음 주 금요일까지
-# 닷새 동안 반영되지 않는다. 경정 버전에서 같은 이유로 같은 결론에 도달했다.
+# **30분마다 걸고 판단은 게이트에 맡긴다.**
 #
-#   08:30 KST — 개최일이면 발주 전 예상 게시 / 그 외에는 전날 결과 반영
-#   23:30 KST — 마지막 경주(21:20 발주)가 끝난 뒤 한 번 더 훑는다
+# 예전에는 하루 두 번(08:30·23:30 KST)만 돌았다. 2026-09-11 개최일 아침에
+# 러너에서 data.go.kr 전 엔드포인트가 ConnectTimeout 을 냈고, 세 번의 자체
+# 재시도가 모두 같은 지점에서 막혔다. 그날 편성이 DB 에 안 들어와 **예상 자체가
+# 만들어지지 않았다** — 발주 전에만 만든다는 규칙 때문에 한 번 놓친 경주는
+# 영영 예상을 못 남긴다. 다음 창은 열다섯 시간 뒤였다.
 #
-# **크론은 UTC 다.** KST 는 +9 이므로 23:30 UTC = 08:30 KST(다음 날),
-# 14:30 UTC = 23:30 KST. GitHub 의 예약 실행은 몇 분에서 십수 분 늦을 수 있다.
-# 08:30 을 고른 것은 첫 발주(11:20)까지 여유를 두기 위해서다.
+# 시각으로 창을 나누는 것도 근거가 약하다. GitHub 은 예약 실행을 몇 시간씩
+# 밀어서 돌린다(23:30 예정이 02:56 에 돈 날이 있었다). 할 일이 없으면 게이트가
+# 저장소도 받지 않고 몇 초에 끝나므로, **넓게 걸고 판단은 상태에 맡긴다.**
 name: 사이트 배포
 
 on:
   schedule:
-    - cron: "30 23 * * *"     # 매일 08:30 KST
-    - cron: "30 14 * * *"     # 매일 23:30 KST
-  workflow_dispatch:           # 손으로도 돌릴 수 있게
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+    inputs:
+      retrain:
+        description: "모델 재학습 강제 실행"
+        type: boolean
+        default: false
 
 permissions:
-  # 확정 기록(records/frozen.json)을 저장소에 되돌려 쓰기 위해 write 가 필요하다.
+  # 확정 기록(records/frozen.json)과 재학습한 모델을 저장소에 되돌려 쓴다.
   contents: write
   pages: write
   id-token: write
 
 # 배포는 한 번에 하나만. 앞 실행이 끝나기 전에 다음이 끼어들면 반쯤 만든
-# 사이트가 올라갈 수 있다.
+# 사이트가 올라가고, DB 를 동시에 쓰게 된다.
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -36,13 +42,60 @@ env:
   PYTHONPATH: src
   KCYCLE_SERVICE_KEY: ${{ secrets.KCYCLE_SERVICE_KEY }}
   # 커스텀 도메인(cycle.koreanblog.xyz)은 루트에 놓이므로 기준 경로가 없다.
-  # 프로젝트 페이지로 임시 배포할 일이 생기면 여기를 /<저장소명> 으로 채우고
-  # config.yaml 의 site.url·base_path 도 함께 바꾼다.
   CYCLEAI_BASE: ""
+  # 모델이 이보다 오래되면 재학습한다. 자료는 매주 40경주씩 쌓인다.
+  RETRAIN_AFTER_DAYS: "14"
 
 jobs:
-  build:
+  # 할 일이 남았는지만 본다. 남지 않았으면 저장소도 받지 않고 끝나므로
+  # 30분마다 걸어 두어도 비용이 거의 없다. 수동 실행은 언제나 통과시킨다.
+  gate:
     runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.check.outputs.go }}
+      why: ${{ steps.check.outputs.why }}
+    steps:
+      - id: check
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "go=true"  >> "$GITHUB_OUTPUT"
+            echo "why=수동 실행" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+
+          # **시각이 아니라 사이트가 말하는 상태로 판단한다.** 크론이 밀려도
+          # 판단 근거는 흔들리지 않는다.
+          S=$(curl -fsS --max-time 20 \
+                "https://cycle.koreanblog.xyz/status.json?t=$(date +%s)" || echo "")
+          UP=$(printf '%s' "$S"  | jq -r '.upcoming_unpredicted // 0' 2>/dev/null || echo 0)
+          PEND=$(printf '%s' "$S"| jq -r '.settle_pending      // 0' 2>/dev/null || echo 0)
+          OKC=$(printf '%s' "$S" | jq -r '.collect_ok          // true' 2>/dev/null || echo true)
+          AT=$(printf '%s' "$S"  | jq -r '.built_at            // ""' 2>/dev/null || echo "")
+
+          # 상태가 오래되면 그 자체가 '뭔가 안 돌고 있다'는 신호다.
+          AGE=99
+          if [ -n "$AT" ]; then
+            NOW=$(date +%s)
+            B=$(date -u -d "$AT+09:00" +%s 2>/dev/null || echo 0)
+            [ "$B" -gt 0 ] && AGE=$(( (NOW - B) / 3600 ))
+          fi
+
+          if   [ -z "$S" ];            then GO=true;  WHY="상태를 읽지 못했다 — 모르면 진행한다"
+          elif [ "$OKC" != "true" ];   then GO=true;  WHY="직전 실행에서 수집이 막혔다"
+          elif [ "$AGE" -ge 6 ];       then GO=true;  WHY="상태가 ${AGE}시간 전 것이다"
+          elif [ "${UP:-0}" -gt 0 ];   then GO=true;  WHY="발주 전인데 예상이 없는 경주 ${UP}개"
+          elif [ "${PEND:-0}" -gt 0 ]; then GO=true;  WHY="밀린 정산 ${PEND}경주"
+          else                              GO=false; WHY="게재도 정산도 밀린 것이 없다"
+          fi
+          echo "$WHY"
+          echo "go=$GO"   >> "$GITHUB_OUTPUT"
+          echo "why=$WHY" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      collect_ok: ${{ steps.collect.outputs.ok }}
     steps:
       - uses: actions/checkout@v4
 
@@ -53,13 +106,11 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      # 수집 자료(600MB 남짓, raw_json 정리 후 그보다 작다)는 저장소에 담지 않고
-      # 캐시로 나른다.
+      # 수집 자료는 저장소에 담지 않고 캐시로 나른다.
       #
       # **복원과 저장을 나눈 이유**: 통짜 actions/cache 는 잡이 실패하면 저장을
       # 건너뛴다. 첫 실행에서 24년치를 오래 받아 놓고 뒤 단계가 깨지면 그 수집이
-      # 통째로 날아간다. 수집이 끝나자마자 저장해 두면 이후 어디서 깨지든 다음
-      # 실행이 그 지점부터 이어간다.
+      # 통째로 날아간다.
       - name: 수집 자료 복원
         uses: actions/cache/restore@v4
         with:
@@ -68,33 +119,35 @@ jobs:
           restore-keys: cycleai-db-
 
       # 캐시가 없으면(첫 실행·만료) 처음부터 만든다. 24년치 백필이 1,500회
-      # 남짓 호출이라 개발계정 일일 한도 안에 들어간다. 시간은 걸리지만 드물다.
+      # 남짓 호출이라 개발계정 일일 한도 안에 들어간다.
       #
-      # 포털이 잠시 죽어도 배포까지 죽이지 않는다. 통신 한 번 실패했다고
-      # 사이트를 아예 안 굽는 것보다, 기존 자료로 굽고 경고를 남기는 편이 낫다.
-      # 자료 결손은 뒤의 점검 단계가 세고, 다음 실행이 이어받는다.
-      #
-      # 다만 **DB 가 아예 없을 때의 최초 수집은 관대하게 넘기지 않는다.**
-      # 그때 실패하면 예상도 검증도 없는 빈 사이트가 올라간다.
+      # 포털이 잠시 죽어도 배포까지 죽이지 않는다 — 자료 결손은 뒤의 점검
+      # 단계가 세고, 30분 뒤 실행이 이어받는다. 다만 **수집이 통째로 실패했다는
+      # 사실은 남긴다**(collect.ok). 게이트가 그것만 보고도 다시 돌린다.
       - name: 자료 수집
+        id: collect
+        timeout-minutes: 25
         run: |
-          # 해외 러너에서 포털 접속이 자주 끊긴다. 클라이언트가 이미 재시도를
-          # 하지만, 그래도 못 받으면 단계 수준에서 두 번 더 시도한다.
           collect () {
             for try in 1 2 3; do
               python -m cycleai.kcycle.collect daily && return 0
-              echo "수집 $try 회차 실패 — 30초 뒤 다시 시도"
-              sleep 30
+              echo "수집 $try 회차 실패 — 60초 뒤 다시 시도"
+              sleep 60
             done
             return 1
           }
           if [ -f data/cycleai.sqlite ]; then
-            collect \
-              || echo "::warning::자료 수집 실패 — 기존 자료로 진행합니다"
+            if collect; then
+              echo "ok=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "ok=false" >> "$GITHUB_OUTPUT"
+              echo "::warning::자료 수집 실패 — 기존 자료로 진행합니다"
+            fi
           else
             echo "캐시 없음 — 처음부터 수집합니다"
             python -m cycleai.kcycle.collect backfill
             python -m cycleai.predict backfill
+            echo "ok=true" >> "$GITHUB_OUTPUT"
           fi
           python -m cycleai.kcycle.collect prune || true
 
@@ -102,6 +155,7 @@ jobs:
       # **발주 전에 확정 저장한 예상은 그때 사라지면 안 된다** — 적중률이
       # 사후 조작이 아니라는 근거가 그것뿐이다. 저장소의 파일이 원본이다.
       - name: 확정 기록 복원
+        timeout-minutes: 5
         run: python -m cycleai.predict import
 
       # 비싼 단계가 끝났으니 곧바로 저장한다. 뒤에서 실패해도 남는다.
@@ -112,38 +166,97 @@ jobs:
           path: data
           key: cycleai-db-${{ github.run_id }}
 
+      # 모델은 저장소에 두고 CI 가 그대로 쓴다. 다만 자료는 매주 40경주씩
+      # 쌓이므로 두 주에 한 번은 다시 학습해야 낡지 않는다.
+      #
+      # 보관된 피클을 실제로 열어 보는 것도 여기서 한다. scikit-learn 버전이
+      # 어긋나면 피클은 그대로 깨지는데, 그걸 예측 단계에서 처음 알면 그날
+      # 예상이 통째로 빠진다.
+      - name: 재학습 필요 여부
+        id: need
+        run: |
+          if [ -f models/model.joblib ] && \
+             ! python -c "from cycleai.model import load; load()" 2>/dev/null; then
+            echo "::warning::보관된 모델을 읽지 못했습니다 → 재학습합니다"
+            rm -f models/model.joblib
+          fi
+          AGE=$(python -m cycleai.model age --db data/cycleai.sqlite)
+          if [ ! -f models/model.joblib ]; then
+            echo "yes=true" >> "$GITHUB_OUTPUT"; echo "모델 없음 → 학습"
+          elif [ "${{ inputs.retrain }}" = "true" ]; then
+            echo "yes=true" >> "$GITHUB_OUTPUT"; echo "수동 요청 → 재학습"
+          elif [ "$AGE" -ge "$RETRAIN_AFTER_DAYS" ]; then
+            echo "yes=true" >> "$GITHUB_OUTPUT"; echo "모델이 ${AGE}일 됐다 → 재학습"
+          else
+            echo "yes=false" >> "$GITHUB_OUTPUT"; echo "모델 ${AGE}일 — 재학습 생략"
+          fi
+
+      - name: 모델 재학습
+        if: steps.need.outputs.yes == 'true'
+        timeout-minutes: 90
+        continue-on-error: true
+        run: |
+          python -m cycleai.model train --since-year 2010 | tee models/report.txt
+          python -m cycleai.predict backfill
+          python -m cycleai.calibrate | tee -a models/report.txt
+
       # 발주가 지나지 않은 경주에만 예상을 만든다. 이미 저장된 예상은 건드리지
-      # 않으므로 하루 두 번 돌려도 덮어쓰지 않는다.
+      # 않으므로 30분마다 돌려도 덮어쓰지 않는다.
       - name: 예상 생성
+        timeout-minutes: 15
         run: |
           python -m cycleai.predict upcoming \
             || echo "::warning::예상 생성 실패 — 기존 예상으로 진행합니다"
 
-      # 자료 결손은 실패로 만들지 않는다 — 배당은 원래 늦게 들어오므로 저녁
+      # 자료 결손은 실패로 만들지 않는다 — 배당은 원래 늦게 들어오므로 밤
       # 실행에서도 일부는 비어 있다. 다만 로그에는 남겨 눈에 띄게 한다.
       - name: 자료 점검
-        run: python -m cycleai.audit --days 30 || true
+        timeout-minutes: 5
+        run: python -m cycleai.audit --days 30 | tee /tmp/audit.txt || true
 
-      # 새로 확정한 예상을 저장소에 남긴다. 캐시는 임시지만 저장소는 남는다.
-      - name: 확정 기록 저장
+      # 새로 확정한 예상과 재학습한 모델을 저장소에 남긴다. 캐시는 임시지만
+      # 저장소는 남는다.
+      - name: 기록 저장
+        timeout-minutes: 5
+        continue-on-error: true
         run: |
           python -m cycleai.predict export
-          if git diff --quiet records/; then
-            echo "새로 확정된 예상 없음"
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add records/ models/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "달라진 기록 없음"
           else
-            git config user.name  "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add records/
-            git commit -m "확정 기록 갱신 ($(TZ=Asia/Seoul date +%Y-%m-%d\ %H:%M) KST)"
-            git push
+            git commit -q -m "기록 갱신 ($(TZ=Asia/Seoul date +%Y-%m-%d\ %H:%M) KST)"
+            git pull --rebase --autostash -q origin main
+            git push -q origin HEAD:main && echo "기록 완료"
           fi
 
       - name: 사이트 빌드
+        timeout-minutes: 20
+        env:
+          CYCLEAI_COLLECT_OK: ${{ steps.collect.outputs.ok }}
         run: python -m cycleai.site
 
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+
+      - name: 요약
+        if: always()
+        run: |
+          {
+            echo "### 실행 이유"
+            echo "${{ needs.gate.outputs.why }}"
+            echo "### 상태"
+            echo '```'; cat dist/status.json 2>/dev/null || echo "(없음)"; echo '```'
+            if [ -s /tmp/audit.txt ]; then
+              echo "### 자료 점검"; echo '```'; cat /tmp/audit.txt; echo '```'
+            fi
+            if [ -f models/report.txt ]; then
+              echo "### 모델 검증"; echo '```'; cat models/report.txt; echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
   deploy:
     needs: build
@@ -154,3 +267,47 @@ jobs:
     steps:
       - id: deploy
         uses: actions/deploy-pages@v4
+
+  # 돌 때마다 결과를 보고한다. **'성공했습니다'만 보내면 사흘이면 안 읽게 되고,
+  # 그러면 정작 실패한 날도 지나친다.** 매번 무엇이 달라졌는지를 담는다.
+  #
+  # 비밀값이 없으면 조용히 넘어간다 — 보고는 곁다리지 파이프라인의 조건이 아니다.
+  notify:
+    needs: [gate, build, deploy]
+    if: always() && needs.gate.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: 텔레그램 보고
+        continue-on-error: true
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          BUILD: ${{ needs.build.result }}
+          DEPLOY: ${{ needs.deploy.result }}
+          COLLECT: ${{ needs.build.outputs.collect_ok }}
+        run: |
+          [ -n "$TG_TOKEN" ] && [ -n "$TG_CHAT" ] || { echo "보고 설정 없음 — 넘어간다"; exit 0; }
+          NOW=$(TZ=Asia/Seoul date '+%m/%d %H:%M')
+          if [ "$BUILD" = "success" ] && [ "$DEPLOY" = "success" ]; then
+            S=$(curl -fsS --max-time 20 "https://cycle.koreanblog.xyz/status.json?t=$(date +%s)" || echo '{}')
+            UP=$(printf '%s' "$S" | jq -r '.upcoming_total // 0')
+            NP=$(printf '%s' "$S" | jq -r '.upcoming_unpredicted // 0')
+            PD=$(printf '%s' "$S" | jq -r '.settle_pending // 0')
+            BODY=$(printf '경륜 분석 · %s KST\n\n■ 게재\n  발주 전 %s경주' "$NOW" "$UP")
+            [ "$NP" -gt 0 ] && BODY=$(printf '%s\n  ⚠ 그중 %s경주는 아직 예상 없음' "$BODY" "$NP")
+            [ "$PD" -gt 0 ] && BODY=$(printf '%s\n\n■ 밀린 정산 %s경주' "$BODY" "$PD")
+            [ "$COLLECT" = "false" ] && BODY=$(printf '%s\n\n■ 다만\n  자료 수집이 막혔습니다 (포털 응답 없음).\n  30분 뒤 자동으로 다시 시도합니다.' "$BODY")
+          else
+            BODY=$(printf '경륜 분석 · %s KST\n\n■ 실패\n  %s\n\n30분 뒤 자동으로 다시 시도합니다.' \
+                     "$NOW" "$RUN_URL")
+          fi
+          curl -sS --max-time 20 -X POST \
+            "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TG_CHAT}" \
+            --data-urlencode "text=${BODY}" \
+            -o /dev/null -w "  텔레그램 %{http_code}\n" || true

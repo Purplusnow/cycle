@@ -423,6 +423,57 @@ def build_curve_chart(stage: Dict, start_bankroll: float) -> Dict:
     }
 
 
+STATUS_SQL = """
+SELECT r.race_key, r.race_ymd, r.post_time,
+       COALESCE(r.has_result, 0) AS has_result,
+       (SELECT COUNT(*) FROM entries e WHERE e.race_key = r.race_key)  AS n_entry,
+       (SELECT COUNT(*) FROM predictions p WHERE p.race_key = r.race_key
+                                       AND p.model_version = ?)        AS n_pred
+FROM races r
+WHERE r.meet_nm = ? AND r.race_ymd IS NOT NULL AND r.race_ymd >= ?
+"""
+
+
+def build_status(conn: sqlite3.Connection, *, venue: str = "광명") -> Dict:
+    """자동화가 읽는 상태 파일.
+
+    **워크플로가 '지금 할 일이 남았는가'를 몇 초 만에 판단하게 하려고 만든다.**
+    30분마다 걸어 두어도 할 일이 없으면 게이트가 저장소도 받지 않고 끝나므로
+    비용이 거의 없다. 하루 두 번만 돌던 때는 개최일 아침에 수집이 막히면 그날
+    예상을 통째로 놓쳤다 — 발주 전에만 만들 수 있기 때문이다(2026-09-11).
+
+    사이트가 스스로 말하는 상태를 근거로 삼는다. 워크플로가 '몇 시인가'로
+    판단하면 GitHub 이 크론을 몇 시간씩 미루는 순간 근거가 무너진다.
+    """
+    since = (today_kst() - dt.timedelta(days=21)).strftime("%Y%m%d")
+    rows = [_dict(r) for r in conn.execute(STATUS_SQL, (LIVE_VERSION, venue, since))]
+    now = now_kst()
+    today = today_kst().strftime("%Y%m%d")
+
+    # 아직 발주하지 않았는데 예상이 없는 경주 — **가장 급한 신호**다.
+    unpred = [r for r in rows if r["n_entry"] and not r["n_pred"]
+              and (_post_dt(r) or now) > now]
+    upcoming = [r for r in rows if (_post_dt(r) or now) > now]
+    # 발주가 지난 어제 이전 경주인데 착순이 없는 것. 당일 것은 원래 새벽에
+    # 들어오므로 '밀린 것'으로 세지 않는다.
+    pending = [r for r in rows if not r["has_result"] and r["n_entry"]
+               and r["race_ymd"] < today]
+
+    return {
+        "built_at": now.isoformat(timespec="seconds"),
+        "today": today,
+        "upcoming_total": len(upcoming),
+        "upcoming_unpredicted": len(unpred),
+        "upcoming_days": sorted({r["race_ymd"] for r in upcoming}),
+        "settle_pending": len(pending),
+        "settle_pending_days": sorted({r["race_ymd"] for r in pending}),
+        # 워크플로가 넘겨 주는 값. 직전 실행에서 수집이 막혔으면 게이트가
+        # 그것만 보고도 다시 돌린다 — 사이트 숫자만으로는 '자료가 안 들어온 것'과
+        # '원래 없는 것'을 구분할 수 없다.
+        "collect_ok": os.environ.get("CYCLEAI_COLLECT_OK", "") != "false",
+    }
+
+
 def load_metrics(path: Path = Path("models/metrics.json")) -> Dict:
     """학습·검증 규모를 화면에 그대로 노출한다.
 
@@ -650,6 +701,8 @@ def build(db: str, out: Path, cfg: Dict) -> None:
                 for h in group:
                     h["has_page"] = h["race_key"] in have_page
 
+        status = build_status(conn)
+
         # ── 베팅 전략 ────────────────────────────────────────────
         strat = strategy_report(conn, OOS_VERSION)
         if not strat.get("empty"):
@@ -697,6 +750,11 @@ def build(db: str, out: Path, cfg: Dict) -> None:
             f"Sitemap: {site_url}{base}/sitemap.xml\n", encoding="utf-8")
         log.info("사이트맵 %d개 주소", len(urls))
 
+    (out / "status.json").write_text(
+        json.dumps(status, ensure_ascii=False, indent=1), encoding="utf-8")
+    log.info("상태: 발주 전 %d경주 중 예상 없음 %d · 밀린 정산 %d경주",
+             status["upcoming_total"], status["upcoming_unpredicted"],
+             status["settle_pending"])
     log.info("경주 상세 %d개 · 경주일 %d개 · 다가올 %d경주 · 결과 %d경주",
              len(race_pages), len(days), len(upcoming), len(finished))
     log.info("빌드 완료 → %s", out)

@@ -47,6 +47,11 @@ METRICS_PATH = MODEL_DIR / "metrics.json"
 MODEL_VERSION = "v1"
 
 
+def _now_kst_iso() -> str:
+    from .clock import now_kst
+    return now_kst().isoformat(timespec="seconds")
+
+
 def _matrix(df: pd.DataFrame, cols: List[str]) -> pd.DataFrame:
     """컬럼 순서를 고정한 입력 행렬. 범주형은 코드로 인코딩."""
     X = df.reindex(columns=cols).copy()
@@ -307,6 +312,17 @@ def save(models: Dict, cols: List[str], metrics: Dict, path: Path = MODEL_PATH) 
                             encoding="utf-8")
 
 
+def model_age_days(path: Path = METRICS_PATH) -> int:
+    """보관된 모델이 며칠 됐나. 알 수 없으면 아주 큰 값(=재학습하라)."""
+    import datetime as _dt
+
+    try:
+        at = json.loads(path.read_text(encoding="utf-8")).get("trained_at")
+        return (_dt.datetime.now() - _dt.datetime.fromisoformat(at)).days
+    except (OSError, ValueError, TypeError, AttributeError):
+        return 999
+
+
 def load(path: Path = MODEL_PATH) -> Dict:
     import joblib
 
@@ -347,13 +363,19 @@ def report(s: Dict) -> str:
 
 def main(argv: Optional[List[str]] = None) -> int:
     ap = argparse.ArgumentParser(description="경륜 승률 모델 학습/검증")
-    ap.add_argument("command", choices=["train", "validate"])
+    ap.add_argument("command", choices=["train", "validate", "age"])
     ap.add_argument("--db", default="data/cycleai.sqlite")
     ap.add_argument("--folds", type=int, default=5)
     ap.add_argument("--min-train-races", type=int, default=2000)
     ap.add_argument("--since-year", type=int, default=None,
                     help="이 해부터만 학습 (오래된 규정 변화를 배제)")
     args = ap.parse_args(argv)
+
+    # 자동 재학습이 '이 모델이 며칠 된 것인가'를 물을 때 쓴다. 워크플로에서
+    # heredoc 으로 파이썬을 심으면 YAML 블록 들여쓰기가 깨지므로 여기 둔다.
+    if args.command == "age":
+        print(model_age_days())
+        return 0
 
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     conn = sqlite3.connect(args.db)
@@ -383,6 +405,9 @@ def main(argv: Optional[List[str]] = None) -> int:
             print("모델 학습 실패: 레이블 부족", file=sys.stderr)
             return 1
         save(models, cols, {
+            # 자동 재학습이 '이 모델이 며칠 된 것인가'를 알아야 한다.
+            # 파일 mtime 은 git checkout 이 지우므로 값으로 남긴다.
+            "trained_at": _now_kst_iso(),
             "walk_forward": summary,
             "trained_rows": len(df),
             "trained_races": int(df["race_key"].nunique()),
