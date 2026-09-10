@@ -17,8 +17,9 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, Iterator, List, Optional
 
 from ..clock import today_kst
 from . import normalize as N
@@ -41,6 +42,30 @@ OPPO_YEARS = 3
 # 백필에서 가장 비싼 항목이므로 기본은 최근 연도만 받는다.
 TMS_YEARS = 3
 MAX_WEEK = 40
+
+
+@contextmanager
+def step(name: str, problems: List[str]) -> Iterator[None]:
+    """구간 하나. **실패해도 다음 구간으로 넘어간다.**
+
+    실측(2026-09-11): 출주표 API 가 ConnectTimeout 을 내자 그 해 수집이 첫
+    구간에서 죽었고, 뒤따르는 착순·배당·선수정보까지 한 줄도 못 받았다. 그날은
+    개최일이었는데 **편성이 안 들어와 예상 자체가 만들어지지 않았다** — 발주
+    전에 확정 저장한다는 규칙 때문에, 한 번 놓친 경주는 영영 예상을 못 남긴다.
+
+    구간별 커밋이 '뒤가 죽어도 앞은 남긴다'였다면, 이것은 '앞이 죽어도 뒤는
+    받는다'이다. 해외 러너에서 data.go.kr 은 엔드포인트별로 따로 끊긴다.
+
+    호출 한도(22)·IP 차단(29)만은 그대로 올린다 — 그때는 다음 구간을 두드려도
+    똑같이 막히고, 남은 한도만 태운다.
+    """
+    try:
+        yield
+    except KcycleApiError as e:
+        if e.code in ("22", "29"):
+            raise
+        log.warning("  %s 실패 — 건너뜁니다: %s", name, e)
+        problems.append(name)
 
 
 def _years(args_years: Optional[List[int]], mode: str) -> List[int]:
@@ -67,6 +92,7 @@ def collect_year(client: KcycleClient, conn, year: int, *, force: bool = False,
     """
     y = str(year)
     out: Dict[str, int] = {}
+    problems: List[str] = []
     this_year = today_kst().year
 
     def done(endpoint: str, coord: str) -> bool:
@@ -78,21 +104,22 @@ def collect_year(client: KcycleClient, conn, year: int, *, force: bool = False,
 
     # --- 출주표: 피처. 광명만 나온다 (창원·부산은 출주표 자체가 없다) ---
     if not done("race_card", y):
-        recs = client.fetch(REGISTRY["race_card"].path, {"stnd_yr": y},
-                            rows=1000, max_pages=60)
-        races = {r["race_key"]: r for r in
-                 filter(None, (N.race_row_from_entry(x) for x in recs))}
-        entries = []
-        for rec in recs:
-            row = N.entry_row(rec)
-            if row and row.get("back_no"):
-                row["raw_json"] = dumps(rec)
-                entries.append(row)
-        upsert(conn, "races", list(races.values()), ["race_key"])
-        upsert(conn, "entries", entries, ["race_key", "back_no"])
-        log_fetch(conn, "race_card", y, len(recs))
-        conn.commit()
-        out["entries"] = len(entries)
+        with step("출주표", problems):
+            recs = client.fetch(REGISTRY["race_card"].path, {"stnd_yr": y},
+                                rows=1000, max_pages=60)
+            races = {r["race_key"]: r for r in
+                     filter(None, (N.race_row_from_entry(x) for x in recs))}
+            entries = []
+            for rec in recs:
+                row = N.entry_row(rec)
+                if row and row.get("back_no"):
+                    row["raw_json"] = dumps(rec)
+                    entries.append(row)
+            upsert(conn, "races", list(races.values()), ["race_key"])
+            upsert(conn, "entries", entries, ["race_key", "back_no"])
+            log_fetch(conn, "race_card", y, len(recs))
+            conn.commit()
+            out["entries"] = len(entries)
 
     # --- 착순: 레이블. **창원·부산도 넣는다** (광명 선수의 원정 성적이다) ---
     #
@@ -106,74 +133,82 @@ def collect_year(client: KcycleClient, conn, year: int, *, force: bool = False,
     # 그래서 결과가 확정적이다. 회차별로 훑으면 39회 호출로 14,455건 전부가
     # 중복 없이 들어온다 — totalCount 와 정확히 일치한다.
     if not done("race_rank", y):
-        total = 0
-        for wk in range(1, MAX_WEEK + 1):
-            recs = client.fetch(REGISTRY["race_rank"].path,
-                                to_api_params("race_rank",
-                                              {"stnd_yr": y, "week_tcnt": wk}),
-                                rows=1000, max_pages=3)
-            if not recs:
-                continue
-            upsert(conn, "races", N.race_rows_from_result(recs), ["race_key"])
-            rows = N.result_rows(recs)
-            for row, rec in zip(rows, recs):
-                row["raw_json"] = dumps(rec)
-            upsert(conn, "results", rows, ["race_key", "racer_nm"])
-            total += len(rows)
-        log_fetch(conn, "race_rank", y, total)
-        conn.commit()
-        out["results"] = total
+        with step("착순", problems):
+            total = 0
+            for wk in range(1, MAX_WEEK + 1):
+                recs = client.fetch(REGISTRY["race_rank"].path,
+                                    to_api_params("race_rank",
+                                                  {"stnd_yr": y, "week_tcnt": wk}),
+                                    rows=1000, max_pages=3)
+                if not recs:
+                    continue
+                upsert(conn, "races", N.race_rows_from_result(recs), ["race_key"])
+                rows = N.result_rows(recs)
+                for row, rec in zip(rows, recs):
+                    row["raw_json"] = dumps(rec)
+                upsert(conn, "results", rows, ["race_key", "racer_nm"])
+                total += len(rows)
+            log_fetch(conn, "race_rank", y, total)
+            conn.commit()
+            out["results"] = total
 
     # --- 배당: 검증. 연 단위로 통째로 온다 ---
     if not done("payoff", y):
-        recs = client.fetch(REGISTRY["payoff"].path, {"stnd_yr": y},
-                            rows=1000, max_pages=20)
-        rows = [r for rec in recs for r in N.payoff_rows(rec)]
-        upsert(conn, "payoffs", rows, ["race_key", "pool"])
-        log_fetch(conn, "payoff", y, len(recs))
-        conn.commit()
-        out["payoffs"] = len(rows)
+        with step("배당", problems):
+            recs = client.fetch(REGISTRY["payoff"].path, {"stnd_yr": y},
+                                rows=1000, max_pages=20)
+            rows = [r for rec in recs for r in N.payoff_rows(rec)]
+            upsert(conn, "payoffs", rows, ["race_key", "pool"])
+            log_fetch(conn, "payoff", y, len(recs))
+            conn.commit()
+            out["payoffs"] = len(rows)
 
     # --- 선수 연도별 집계: 사전값 ---
     if not done("racer_info", y):
-        recs = client.fetch(REGISTRY["racer_info"].path, {"stnd_yr": y},
-                            rows=1000, max_pages=10)
-        rows = list(filter(None, (N.racer_year_row(x) for x in recs)))
-        upsert(conn, "racer_year", rows, ["stnd_yr", "racer_nm"])
-        log_fetch(conn, "racer_info", y, len(recs))
-        conn.commit()
-        out["racer_year"] = len(rows)
+        with step("선수정보", problems):
+            recs = client.fetch(REGISTRY["racer_info"].path, {"stnd_yr": y},
+                                rows=1000, max_pages=10)
+            rows = list(filter(None, (N.racer_year_row(x) for x in recs)))
+            upsert(conn, "racer_year", rows, ["stnd_yr", "racer_nm"])
+            log_fetch(conn, "racer_info", y, len(recs))
+            conn.commit()
+            out["racer_year"] = len(rows)
 
     # --- 낙차·사고: 선수 단위 이력 ---
     if not done("down_accident", y):
-        recs = client.fetch(REGISTRY["down_accident"].path,
-                            to_api_params("down_accident", {"stnd_yr": y}),
-                            rows=1000, max_pages=10)
-        rows = [r for rec in recs for r in N.accident_rows(rec)]
-        upsert(conn, "accidents", rows,
-               ["stnd_yr", "week_tcnt", "day_tcnt", "race_no", "racer_nm"])
-        log_fetch(conn, "down_accident", y, len(recs))
-        conn.commit()
-        out["accidents"] = len(rows)
+        with step("낙차사고", problems):
+            recs = client.fetch(REGISTRY["down_accident"].path,
+                                to_api_params("down_accident", {"stnd_yr": y}),
+                                rows=1000, max_pages=10)
+            rows = [r for rec in recs for r in N.accident_rows(rec)]
+            upsert(conn, "accidents", rows,
+                   ["stnd_yr", "week_tcnt", "day_tcnt", "race_no", "racer_nm"])
+            log_fetch(conn, "down_accident", y, len(recs))
+            conn.commit()
+            out["accidents"] = len(rows)
 
     if not heavy:
+        if problems:
+            out["_failed"] = problems
         return out
 
     # --- 상대전적: 최근 연도만 ---
     if year > this_year - OPPO_YEARS and not done("oppo_win", y):
-        # 연 6만 3천 행이라 페이지가 63장이다. max_pages 를 60 으로 두었더니
-        # 정확히 60,000 행에서 잘렸는데, **딱 떨어지는 숫자가 유일한 단서였다** —
-        # 오류도 경고도 없이 뒤쪽 선수들만 조용히 빠진다.
-        recs = client.fetch(REGISTRY["oppo_win"].path, {"stnd_yr": y},
-                            rows=1000, max_pages=120)
-        rows = list(filter(None, (N.oppo_row(x) for x in recs)))
-        upsert(conn, "oppo", rows, ["stnd_yr", "racer_nm", "oppo_nm"])
-        log_fetch(conn, "oppo_win", y, len(recs))
-        conn.commit()
-        out["oppo"] = len(rows)
+        with step("상대전적", problems):
+            # 연 6만 3천 행이라 페이지가 63장이다. max_pages 를 60 으로 두었더니
+            # 정확히 60,000 행에서 잘렸는데, **딱 떨어지는 숫자가 유일한 단서였다** —
+            # 오류도 경고도 없이 뒤쪽 선수들만 조용히 빠진다.
+            recs = client.fetch(REGISTRY["oppo_win"].path, {"stnd_yr": y},
+                                rows=1000, max_pages=120)
+            rows = list(filter(None, (N.oppo_row(x) for x in recs)))
+            upsert(conn, "oppo", rows, ["stnd_yr", "racer_nm", "oppo_nm"])
+            log_fetch(conn, "oppo_win", y, len(recs))
+            conn.commit()
+            out["oppo"] = len(rows)
 
     # --- 회차별 득점: 회차마다 한 번씩. 최근 연도만 ---
     if year > this_year - TMS_YEARS:
+      with step("회차별득점", problems):
         total = 0
         for wk in range(1, MAX_WEEK + 1):
             coord = f"{y}-{wk:02d}"
@@ -199,6 +234,8 @@ def collect_year(client: KcycleClient, conn, year: int, *, force: bool = False,
                 break
         out["tms_score"] = total
 
+    if problems:
+        out["_failed"] = problems
     return out
 
 
@@ -291,6 +328,8 @@ def main(argv: Optional[List[str]] = None) -> int:
                     break
                 continue
             conn.commit()
+            for name in got.pop("_failed", []):
+                failed.append(f"{year} {name}")
             log.info("  %d: %s", year, got or "이미 받음")
 
         # **제재선수 하나가 전체 수집을 죽이면 안 된다.**
