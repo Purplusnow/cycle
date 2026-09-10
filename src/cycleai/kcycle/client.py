@@ -184,10 +184,16 @@ def _as_list(items: Any) -> List[dict]:
 class KcycleClient:
     service_key: str
     # 연결과 응답을 따로 잡는다. 게이트웨이가 응답하지 않을 때 연결 단계에서
-    # 20초씩 붙들리면 재시도까지 겹쳐 배치가 통째로 타임아웃된다.
-    connect_timeout: float = 6.0
-    timeout: float = 20.0
-    max_retries: int = 4
+    # 오래 붙들리면 재시도까지 겹쳐 배치가 통째로 타임아웃된다.
+    #
+    # **해외 러너에서는 6초가 짧다.** 실측(2026-09-11 아침): GitHub 러너에서
+    # data.go.kr 전 엔드포인트가 ConnectTimeout 을 냈는데 같은 시각 국내에서는
+    # 정상이었다. 경로가 느려진 것인지 막힌 것인지는 밖에서 구분할 수 없으므로,
+    # **연결을 넉넉히 기다리고 재시도 간격도 늘려** 느린 쪽이면 통과하게 둔다.
+    # 정말 막힌 경우라도 구간 격리가 있어 한 구간의 손해로 끝난다.
+    connect_timeout: float = 15.0
+    timeout: float = 25.0
+    max_retries: int = 5
     pause: float = 0.15  # 연속 호출 간격 (코드 23 = 초당 호출량 초과 방지)
     session: requests.Session = field(default_factory=requests.Session)
     _last_call: float = field(default=0.0, repr=False)
@@ -233,7 +239,7 @@ class KcycleClient:
                 )
             except requests.RequestException as e:
                 last_exc = e
-                time.sleep(1.5 * (attempt + 1))
+                time.sleep(min(3 * 2 ** attempt, 30))
                 continue
 
             text = r.text or ""
@@ -243,14 +249,14 @@ class KcycleClient:
                 if exc.fatal:
                     raise exc
                 last_exc = exc
-                time.sleep(1.5 * (attempt + 1))
+                time.sleep(min(3 * 2 ** attempt, 30))
                 continue
 
             if r.status_code == 429:
                 raise KcycleApiError("22", "호출 한도 초과 (일일 트래픽 제한)", url)
             if r.status_code >= 500:
                 last_exc = KcycleApiError(str(r.status_code), "server error", url)
-                time.sleep(1.5 * (attempt + 1))
+                time.sleep(min(3 * 2 ** attempt, 30))
                 continue
             if r.status_code >= 400:
                 # raise_for_status 는 URL 을 그대로 담아 키를 노출한다.
@@ -260,7 +266,7 @@ class KcycleClient:
                 data = r.json()
             except ValueError:
                 last_exc = KcycleApiError("PARSE", f"JSON 파싱 실패: {text[:200]}", url)
-                time.sleep(1.0 * (attempt + 1))
+                time.sleep(min(2 * 2 ** attempt, 20))
                 continue
 
             resp = data.get("response", data)
@@ -271,7 +277,7 @@ class KcycleClient:
                 if exc.fatal:
                     raise exc
                 last_exc = exc
-                time.sleep(1.5 * (attempt + 1))
+                time.sleep(min(3 * 2 ** attempt, 30))
                 continue
 
             return resp.get("body", {}) or {}
