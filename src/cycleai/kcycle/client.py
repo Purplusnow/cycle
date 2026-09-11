@@ -37,6 +37,12 @@ log = logging.getLogger(__name__)
 
 BASE = "https://apis.data.go.kr/B551014"
 
+# 재시도를 다 쓴 네트워크 실패가 이만큼 연달아 나면 한동안 호출을 멈춘다.
+# 포털이 죽은 날 마흔 번을 마저 두드려 봐야 시간만 태운다 — 그 시간이
+# 단계 제한을 넘기면 배포까지 못 한다.
+NET_TRIP_AFTER = 3
+NET_TRIP_SECONDS = 180.0
+
 # 게이트웨이가 정상 처리했음을 뜻하는 결과코드들.
 # GW 는 "00" 을 쓰지만 일부 오퍼레이션이 "0"/"INFO-0" 을 섞어 쓴다.
 OK_CODES = {"00", "0", "INFO-0", "INFO-00", "INFO-000"}
@@ -197,6 +203,14 @@ class KcycleClient:
     pause: float = 0.15  # 연속 호출 간격 (코드 23 = 초당 호출량 초과 방지)
     session: requests.Session = field(default_factory=requests.Session)
     _last_call: float = field(default=0.0, repr=False)
+    # 서킷 브레이커. **포털이 통째로 죽었으면 빨리 포기해야 한다.**
+    #
+    # 연결 대기를 15초로 올리고 재시도를 5회로 늘렸더니, 러너에서 포털이 막힌
+    # 날 회차별 40회 호출이 한 번에 2분씩 걸려 25분 제한을 그대로 태웠다
+    # (2026-09-11). 한 호출을 오래 붙드는 것과 안 되는 줄 알면서 마흔 번
+    # 두드리는 것은 다른 문제다 — 앞은 참을성이고 뒤는 낭비다.
+    _net_fails: int = field(default=0, repr=False)
+    _trip_until: float = field(default=0.0, repr=False)
 
     @classmethod
     def from_env(cls, **kw) -> "KcycleClient":
@@ -229,6 +243,12 @@ class KcycleClient:
         q.setdefault("numOfRows", 100)
         q["resultType"] = "json"
         q["serviceKey"] = self.service_key
+
+        # 차단 상태면 HTTP 를 아예 시도하지 않는다. 식은 뒤 한 번만 찔러 보고,
+        # 그것도 실패하면 다시 차단한다.
+        if time.monotonic() < self._trip_until:
+            raise KcycleApiError(
+                "NETWORK", "포털 접속이 막혀 있어 건너뜁니다 (서킷 차단)", url)
 
         last_exc: Optional[Exception] = None
         for attempt in range(self.max_retries):
@@ -280,12 +300,20 @@ class KcycleClient:
                 time.sleep(min(3 * 2 ** attempt, 30))
                 continue
 
+            self._net_fails = 0
+            self._trip_until = 0.0
             return resp.get("body", {}) or {}
 
         # 네트워크 예외도 KcycleApiError 로 감싸 내보낸다. 호출자가 requests 예외까지
         # 따로 잡아야 한다면, 한 소스의 일시적 실패가 배치 전체를 죽인다.
         if isinstance(last_exc, KcycleApiError):
             raise last_exc
+        self._net_fails += 1
+        if self._net_fails >= NET_TRIP_AFTER:
+            self._trip_until = time.monotonic() + NET_TRIP_SECONDS
+            self._net_fails = 0
+            log.warning("연속 %d회 접속 실패 — %d초간 호출을 멈춥니다",
+                        NET_TRIP_AFTER, NET_TRIP_SECONDS)
         raise KcycleApiError(
             "NETWORK", f"요청 실패: {type(last_exc).__name__}", url
         ) from last_exc

@@ -85,3 +85,67 @@ def test_경주키에_경륜장이_들어간다():
     b = race_key(2026, "창원", 24, 1, 3)
     assert a == "2026-광명-24-1-03"
     assert a != b
+
+
+# ── 서킷 브레이커 ───────────────────────────────────────────────────
+
+def test_포털이_죽으면_빨리_포기한다():
+    """재시도를 다 쓴 실패가 연달아 나면 호출을 멈춘다.
+
+    연결 대기를 15초로 올린 뒤, 포털이 막힌 날 회차별 40회 호출이 한 번에
+    2분씩 걸려 25분 제한을 그대로 태웠다(2026-09-11). 한 호출을 오래 붙드는
+    것과 안 되는 줄 알면서 마흔 번 두드리는 것은 다른 문제다.
+    """
+    import requests
+    from cycleai.kcycle import client as C
+
+    calls = {"n": 0}
+
+    class _Dead:
+        headers: dict = {}
+
+        def get(self, *a, **k):
+            calls["n"] += 1
+            raise requests.ConnectionError("blackhole")
+
+    c = C.KcycleClient(service_key="x", session=_Dead(),
+                       max_retries=2, pause=0.0)
+    fails = tripped = 0
+    for _ in range(10):
+        try:
+            c.raw("A/B", {})
+        except C.KcycleApiError as e:
+            fails += 1
+            tripped += "서킷 차단" in str(e)
+
+    assert fails == 10                      # 전부 실패한다
+    assert tripped >= 6                     # 앞의 몇 번 뒤로는 HTTP 를 안 친다
+    # 차단 뒤에는 실제 요청이 나가지 않는다 — 그것이 시간을 버는 지점이다.
+    assert calls["n"] == C.NET_TRIP_AFTER * 2
+
+
+def test_한_번_성공하면_차단이_풀린다():
+    """차단은 영구적이면 안 된다. 포털이 돌아오면 그대로 이어서 받아야 한다."""
+    import json as _json
+    from cycleai.kcycle import client as C
+
+    class _Resp:
+        status_code = 200
+        text = _json.dumps({"response": {"header": {"resultCode": "00"},
+                                         "body": {"items": {"item": []}}}})
+
+        def json(self):
+            return _json.loads(self.text)
+
+    class _Alive:
+        headers: dict = {}
+
+        def get(self, *a, **k):
+            return _Resp()
+
+    c = C.KcycleClient(service_key="x", session=_Alive(), pause=0.0)
+    # 차단 직전까지 실패가 쌓인 상태를 만든다.
+    c._net_fails = C.NET_TRIP_AFTER - 1
+    c.raw("A/B", {})
+    assert c._net_fails == 0, "성공했는데 실패 카운터가 남아 있으면 엉뚱한 때 차단된다"
+    assert c._trip_until == 0.0

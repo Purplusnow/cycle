@@ -95,7 +95,7 @@ jobs:
     if: needs.gate.outputs.go == 'true'
     runs-on: ubuntu-latest
     outputs:
-      collect_ok: ${{ steps.collect.outputs.ok }}
+      collect_ok: ${{ steps.collect.outcome == 'success' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -124,32 +124,34 @@ jobs:
       # 포털이 잠시 죽어도 배포까지 죽이지 않는다 — 자료 결손은 뒤의 점검
       # 단계가 세고, 30분 뒤 실행이 이어받는다. 다만 **수집이 통째로 실패했다는
       # 사실은 남긴다**(collect.ok). 게이트가 그것만 보고도 다시 돌린다.
+      # **이 단계는 잡을 죽이지 않는다.** 포털이 죽어도 이미 만들어 둔 예상은
+      # 올려야 한다 — 정작 방문자가 필요할 때 사이트가 낡으면 안 된다. 예전에는
+      # `|| echo warning` 으로 감쌌는데, timeout-minutes 를 붙이자 시간 초과가
+      # 그것을 뚫고 잡을 죽였고 배포까지 건너뛰었다(2026-09-11).
+      #
+      # 실패 사실은 outcome 으로 남는다. 게이트가 그것만 보고 30분 뒤 다시 돈다.
       - name: 자료 수집
         id: collect
-        timeout-minutes: 25
+        continue-on-error: true
+        timeout-minutes: 20
         run: |
-          collect () {
-            for try in 1 2 3; do
-              python -m cycleai.kcycle.collect daily && return 0
-              echo "수집 $try 회차 실패 — 60초 뒤 다시 시도"
-              sleep 60
-            done
-            return 1
-          }
           if [ -f data/cycleai.sqlite ]; then
-            if collect; then
-              echo "ok=true" >> "$GITHUB_OUTPUT"
-            else
-              echo "ok=false" >> "$GITHUB_OUTPUT"
+            ok=0
+            for try in 1 2 3; do
+              if python -m cycleai.kcycle.collect daily; then ok=1; break; fi
+              echo "수집 $try 회차 실패"
+              [ "$try" -lt 3 ] && sleep 60
+            done
+            python -m cycleai.kcycle.collect prune || true
+            if [ "$ok" != "1" ]; then
               echo "::warning::자료 수집 실패 — 기존 자료로 진행합니다"
+              exit 1
             fi
           else
             echo "캐시 없음 — 처음부터 수집합니다"
             python -m cycleai.kcycle.collect backfill
             python -m cycleai.predict backfill
-            echo "ok=true" >> "$GITHUB_OUTPUT"
           fi
-          python -m cycleai.kcycle.collect prune || true
 
       # 확정 기록을 DB 로 되돌린다. 캐시가 만료되면 DB 는 새로 만들어지는데,
       # **발주 전에 확정 저장한 예상은 그때 사라지면 안 된다** — 적중률이
@@ -235,7 +237,7 @@ jobs:
       - name: 사이트 빌드
         timeout-minutes: 20
         env:
-          CYCLEAI_COLLECT_OK: ${{ steps.collect.outputs.ok }}
+          CYCLEAI_COLLECT_OK: ${{ steps.collect.outcome == 'success' }}
         run: python -m cycleai.site
 
       - uses: actions/upload-pages-artifact@v3
